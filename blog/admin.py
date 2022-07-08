@@ -1,11 +1,15 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Post, Text, Citation, Appendix, Comment
+from .models import Post, Text, Citation, Appendix, Comment, Image
 
 
 class TextInline(admin.TabularInline):
     model = Text
+    extra = 1
+
+class ImageInline(admin.TabularInline):
+    model = Image
     extra = 1
 
 class CitationInline(admin.TabularInline):
@@ -28,7 +32,9 @@ class PostAdmin(admin.ModelAdmin):
     # ]
     inlines = [AppendixInline, TextInline, CitationInline]
 
-# class Textdmin(admin.ModelAdmin):
+class TextAdmin(admin.ModelAdmin):
+      list_display = ('title',)
+      inlines= [ImageInline]
 #     list_display = ('title', 'content', 'link','fontSize', 'indent', 'decor')
 #     list_filter = ("post",)
 #     search_fields = ['title', 'content']
@@ -39,12 +45,14 @@ class CommentAdmin(admin.ModelAdmin):
 	list_filter = ('active', 'created', 'updated')
 	search_fields = ('name', 'email', 'body')
 
-
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ('title',)
 
 
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(Image, ImageAdmin)
 admin.site.register(Post, PostAdmin)
-admin.site.register(Text)
+admin.site.register(Text, TextAdmin)
 admin.site.register(Citation)
 admin.site.register(Appendix)
 

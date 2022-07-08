@@ -101,3 +101,17 @@ class Comment(models.Model):
 	
 	def __str__(self):
 		return 'Comment by {} on {}'.format(self.name, self.post)
+
+class Image(models.Model):
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='images', blank=True)
+    text = models.ForeignKey(
+        Text,
+        on_delete=models.CASCADE,
+        related_name="image",
+        related_query_name="image",
+        blank=True
+    )
+
+    def __str__(self):
+        return self.title

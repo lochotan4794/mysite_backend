@@ -36,6 +36,12 @@ EMAIL_HOST_USER = 'htanloc994@gmail.com'
 EMAIL_HOST_PASSWORD = 'nqkyuurgdtrtjrzz'  
 EMAIL_PORT = 587  
 
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 # users will be redirected to the home page after login
 LOGIN_REDIRECT_URL = 'home'
 
