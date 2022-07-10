@@ -9,22 +9,32 @@ from django.contrib.auth import get_user_model
 
 
 STATUS = (
-    (0,"Draft"),
-    (1,"Publish")
+    (0, "Draft"),
+    (1, "Publish")
 )
 
 TEXT_DECORATION = (
-    (0,"Normal"),
-    (1,"Bold"),
-    (2,"Underline"),
+    (0, "Normal"),
+    (1, "Bold"),
+    (2, "Underline"),
     (3, "Italic")
 )
+
+TEXT_FUNCTIONAL = (
+    (0, "image"),
+    (1, "paragraph"),
+    (2, "header"),
+    (3, "link")
+)
+
 
 class Post(models.Model):
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
+    thumnail = models.ImageField(upload_to='images', blank=True)
+    abstract = models.CharField(max_length=200, unique=True, blank=True)
     # author = models.ForeignKey(User, on_delete= models.CASCADE,related_name='blog_posts')
-    updated_on = models.DateTimeField(auto_now= True)
+    updated_on = models.DateTimeField(auto_now=True)
     # content = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
@@ -34,6 +44,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Text(models.Model):
     post = models.ForeignKey(
@@ -48,13 +59,16 @@ class Text(models.Model):
     fontSize = models.IntegerField(default=24)
     indent = models.IntegerField(default=0)
     decor = models.IntegerField(choices=TEXT_DECORATION, default=0)
+    type = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
     cssId = models.CharField(max_length=200, blank=True)
+    image = models.ImageField(upload_to='images', blank=True)
 
     class Meta:
         ordering = ['title']
 
     def __str__(self):
         return self.title
+
 
 class Appendix(models.Model):
     text = models.CharField(max_length=200, unique=True, default="")
@@ -70,6 +84,7 @@ class Appendix(models.Model):
     def __str__(self):
         return self.text
 
+
 class Citation(models.Model):
     text = models.CharField(max_length=200, unique=True, default="")
     post = models.ForeignKey(
@@ -82,36 +97,41 @@ class Citation(models.Model):
     def __str__(self):
         return self.text
 
+
 class PublishedManager(models.Manager):
-	def get_queryset(self):
-		return super(PublishedManager,self).get_queryset().filter(status='published')
+    def get_queryset(self):
+        return super(PublishedManager, self).get_queryset().filter(status='published')
+
 
 class Comment(models.Model):
-	post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-	reply_to = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies',null=True, blank=True)
-	name = models.CharField(max_length=80)
-	email = models.EmailField()
-	body = models.TextField()
-	created = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
-	active = models.BooleanField(default=True)
-	
-	class Meta:
-		ordering = ('created',)
-	
-	def __str__(self):
-		return 'Comment by {} on {}'.format(self.name, self.post)
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='comments')
+    reply_to = models.ForeignKey(
+        'self', on_delete=models.CASCADE, related_name='replies', null=True, blank=True)
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
 
-class Image(models.Model):
-    title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='images', blank=True)
-    text = models.ForeignKey(
-        Text,
-        on_delete=models.CASCADE,
-        related_name="image",
-        related_query_name="image",
-        blank=True
-    )
+    class Meta:
+        ordering = ('created',)
 
     def __str__(self):
-        return self.title
+        return 'Comment by {} on {}'.format(self.name, self.post)
+
+
+# class Image(models.Model):
+#     title = models.CharField(max_length=200)
+#     image = models.ImageField(upload_to='images', blank=True)
+#     text = models.ForeignKey(
+#         Text,
+#         on_delete=models.CASCADE,
+#         related_name="image",
+#         related_query_name="image",
+#         blank=True
+#     )
+
+#     def __str__(self):
+#         return self.title
