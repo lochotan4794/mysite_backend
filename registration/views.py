@@ -1,3 +1,4 @@
+from dataclasses import field
 import email
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -11,18 +12,10 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
 from .serializers import RegisterSerializer, UserSerializer, EditUserSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User, auth
-from django.contrib.auth.decorators import login_required
-from rest_framework.viewsets import ModelViewSet
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import permission_classes
-from rest_framework import generics
-from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 
 
@@ -31,19 +24,20 @@ def edit_profile(request):
     if request.method == "POST":
         email = request.POST['email']
         user = get_object_or_404(User, email=email)
-        user.email = "htanloc99pp5@gmail.com"
+        user.email = email
+        for key in request.POST.keys():
+            setattr(user, key,  request.POST[key])
         user.save()
         data = UserSerializer(user).data
         return JsonResponse(data, safe=False)
+
 
 @csrf_exempt
 def login_user(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-
         user = auth.authenticate(username=username, password=password)
-
         if user is not None:
             auth.login(request, user)
             uid = User.objects.get(username=username)
