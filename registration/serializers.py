@@ -5,8 +5,13 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
 
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super(MyTokenObtainPairSerializer, cls).get_token(user)
@@ -16,13 +21,23 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+class EditUserSerializer(serializers.ModelSerializer):
+   class Meta:
+        model = User
+        fields = ('name',)
+
+   def update(self, instance, validated_data): 
+        instance.name = validated_data.get('name', instance.name)
+        instance.save()
+        return instance
+
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-            required=True,
-            validators=[UniqueValidator(queryset=User.objects.all())]
-            )
-
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password])
     # password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
