@@ -38,6 +38,7 @@ class Post(models.Model):
     # content = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
+    total_visited = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['-created_on']
@@ -55,7 +56,7 @@ class Text(models.Model):
     )
     title = models.CharField(max_length=200, unique=True, blank=True)
     content = models.TextField(blank=True)
-    link = models.CharField(max_length=200, unique=True, blank=True)
+    link = models.CharField(max_length=200, blank=True)
     fontSize = models.IntegerField(default=24)
     indent = models.IntegerField(default=0)
     decor = models.IntegerField(choices=TEXT_DECORATION, default=0)
@@ -70,8 +71,43 @@ class Text(models.Model):
         return self.title
 
 
+class Tag(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='tag')
+    title = models.CharField(max_length=200, blank=True)
+    # id = models.AutoField(primary_key=True)
+
+    class Meta:
+        ordering = ['title']
+
+    def __str__(self):
+        return self.title
+
+    def __eq__(self, other):
+        if not isinstance(other, Tag):
+            return NotImplemented
+        if self._meta.concrete_model != other._meta.concrete_model:
+            return False
+        title = self.title
+        if title is None:
+            return self is other
+        return title == other.title
+
+
+# class Membership(models.Model):
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+#     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+
+class Relationship(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='relationship')
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE,
+                            related_name='relationship')
+
+
 class Appendix(models.Model):
-    text = models.CharField(max_length=200, unique=True, default="")
+    text = models.CharField(max_length=200, default="")
     indentLevel = models.IntegerField(default=0)
     link = models.CharField(max_length=200, default="")
     post = models.ForeignKey(
@@ -86,7 +122,7 @@ class Appendix(models.Model):
 
 
 class Citation(models.Model):
-    text = models.CharField(max_length=200, unique=True, default="")
+    text = models.CharField(max_length=200, default="")
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Post, Text, Citation, Appendix, Comment
+from .models import Post, Text, Citation, Appendix, Comment, Tag, Relationship
 
 
 class TextInline(admin.TabularInline):
@@ -24,8 +24,13 @@ class AppendixInline(admin.TabularInline):
     extra = 1
 
 
+class RelationshipInline(admin.TabularInline):
+    model = Relationship
+    extra = 1
+
+
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'status', 'created_on')
+    list_display = ('title', 'slug', 'status', 'created_on', 'total_visited')
     list_filter = ("status",)
     search_fields = ['title']
     prepopulated_fields = {'slug': ('title',)}
@@ -34,7 +39,7 @@ class PostAdmin(admin.ModelAdmin):
     #     (None,               {'fields': ['question_text']}),
     #     ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
     # ]
-    inlines = [AppendixInline, TextInline, CitationInline]
+    inlines = [AppendixInline, TextInline, CitationInline, RelationshipInline]
 
 
 # class TextAdmin(admin.ModelAdmin):
@@ -55,8 +60,14 @@ class ImageAdmin(admin.ModelAdmin):
     list_display = ('title',)
 
 
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('title',)
+    inlines = [RelationshipInline, ]
+    exclude = ('members',)
+
+
 admin.site.register(Comment, CommentAdmin)
-# admin.site.register(Image, ImageAdmin)
+admin.site.register(Tag, TagAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Text)
 admin.site.register(Citation)
