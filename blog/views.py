@@ -96,8 +96,19 @@ def post_list_relative(request, slug):
     if request.method == 'GET' or request.method == 'POST':
         p = Post.objects.filter(slug=slug)[0]
         relationships = p.relationship.all()
-        relative = Post.objects.raw(
-            'SELECT * FROM blog_post WHERE id in %s', relationships.values_list('id', flat=True))
+        # print(relationships.values_list('tag_id', flat=True))
+        # relative = Relationship.objects.raw(
+        #     'SELECT * FROM blog_relationship WHERE tag_id = %s', relationships.values_list('tag_id', flat=True))
+        # if len(relative) == 0:
+        #     return JsonResponse([], safe=False)
+        # posts = Post.objects.raw('SELECT * FROM blog_post WHERE id = %s',
+        #                          relative[0].post_id)
+        # for r in relative:
+        #     posts = Post.objects.raw('SELECT * FROM blog_post WHERE id = %s',
+        #                              r.post_id) | posts
+
+        posts = Post.objects.raw('SELECT p.id, p.title, p.slug FROM blog_post p, blog_relationship r, blog_tag t WHERE p.id = r.post_id AND r.tag_id=%s ORDER BY p.total_visited DESC',
+                                 relationships.values_list('tag_id', flat=True))
         # if len(tags) == 0 or tags is None:
         #     return JsonResponse([])
 
@@ -113,7 +124,7 @@ def post_list_relative(request, slug):
         #         relative = Post.objects.filter(pk=r.values_list("post_id"))
         #         posts = posts | relative
         # # print(tags[0])
-        selected = relative[:5]
+        selected = posts[:5]
         serializer_post = PostSerializer(selected, many=True)
         return JsonResponse(serializer_post.data, safe=False)
         # return JsonResponse([], safe=False)
@@ -143,6 +154,11 @@ def post_detail(request, slug):
     Retrieve, update or delete a code snippet.
     """
     post = get_object_or_404(Post, slug=slug)
+    vs = post.total_visited
+    post.total_visited = vs + 1
+    post.save()
+    # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
+    #     post.total_visited + 1, post.id])
     try:
         text = Text.objects.filter(post=post)
         appendist = Appendix.objects.filter(post=post)
