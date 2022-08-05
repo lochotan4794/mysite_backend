@@ -1,8 +1,11 @@
+from asyncio.windows_events import NULL
 from pyexpat import model
 from turtle import back, title
 from django.db import models
 from numpy import require
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+
 
 # Create your models here.
 # from django.contrib.auth.models import User
@@ -142,6 +145,8 @@ class PublishedManager(models.Manager):
 class Comment(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments', default=1)
     reply_to = models.ForeignKey(
         'self', on_delete=models.CASCADE, related_name='replies', null=True, blank=True)
     name = models.CharField(max_length=80)

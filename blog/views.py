@@ -81,9 +81,10 @@ def post_list_recent(request):
 
 
 @ csrf_exempt
-def post_list_tag(request, tag):
+def post_list_tag(request, t):
     if request.method == 'GET':
-        posts = Post.objects.filter(tag=tag)[:5]
+        tag = get_object_or_404(Tag, title=t)
+        posts = Post.objects.filter(tag=tag)
         serializer_post = PostSerializer(posts, many=True)
         return JsonResponse(serializer_post.data, safe=False)
 

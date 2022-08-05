@@ -13,7 +13,7 @@ urlpatterns = [
     path('list/all/', view=views.post_list, name='list_post'),
     path('list/relevent/', view=views.post_list_relevent, name='list_relevent'),
     path('list/recent/', view=views.post_list_recent, name='list_recent'),
-    path('<str:tag>/list/tag/',
+    path('<str:t>/list/tag/',
          views.post_list_tag, name='post_relative'),
     path('<slug:slug>/list/relative/',
          views.post_list_relative, name='post_relative'),
