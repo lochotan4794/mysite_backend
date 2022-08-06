@@ -1,5 +1,3 @@
-from asyncio.windows_events import NULL
-from pyexpat import model
 from turtle import back, title
 from django.db import models
 from numpy import require
