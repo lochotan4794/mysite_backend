@@ -18,6 +18,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# AUTH_USER_MODEL = 'users.CustomUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -30,11 +31,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-EMAIL_USE_TLS = True  
-EMAIL_HOST = 'smtp.gmail.com'  
-EMAIL_HOST_USER = 'htanloc994@gmail.com'  
-EMAIL_HOST_PASSWORD = 'nqkyuurgdtrtjrzz'  
-EMAIL_PORT = 587  
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'htanloc994@gmail.com'
+EMAIL_HOST_PASSWORD = 'nqkyuurgdtrtjrzz'
+EMAIL_PORT = 587
 
 # Base url to serve media files
 MEDIA_URL = '/media/'
@@ -96,7 +97,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com','https://*.127.0.0.1', 'http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com',
+                        'https://*.127.0.0.1', 'http://localhost:3000']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -4,7 +4,6 @@ from numpy import require
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 
-
 # Create your models here.
 # from django.contrib.auth.models import User
 
