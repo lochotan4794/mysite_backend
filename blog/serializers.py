@@ -36,7 +36,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('title', 'slug', 'updated_on', 'created_on',
-                  'status', 'thumnail', 'abstract', 'total_visited', 'tag')
+                  'status', 'thumnail', 'abstract', 'total_visited', 'tag', 'eng_ver', 'lang')
 
 
 class CommentSerializer(serializers.ModelSerializer):

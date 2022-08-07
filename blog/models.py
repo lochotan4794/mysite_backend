@@ -13,6 +13,11 @@ STATUS = (
     (1, "Publish")
 )
 
+LANG = (
+    (0, "VIE"),
+    (1, "ENG")
+)
+
 TEXT_DECORATION = (
     (0, "Normal"),
     (1, "Bold"),
@@ -39,6 +44,9 @@ class Post(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
     total_visited = models.IntegerField(default=0)
+    eng_ver = models.ForeignKey(
+        'Post', on_delete=models.CASCADE, null=True, blank=True)
+    lang = models.IntegerField(choices=LANG, default=0)
 
     class Meta:
         ordering = ['-created_on']

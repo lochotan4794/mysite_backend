@@ -14,6 +14,8 @@ from .models import Post, Text, Appendix, Citation, Comment, Tag, Relationship
 import distance
 import numpy as np
 from django.contrib.auth.models import User
+import json
+from rest_framework.decorators import api_view
 
 
 def list_to_queryset(model, data):
@@ -170,6 +172,38 @@ def post_detail(request, slug):
         return HttpResponse(status=404)
 
     if request.method == 'GET':
+        serializer_post = PostSerializer(post)
+        serializer_appendist = AppendixSerializer(appendist, many=True)
+        serializer_text = TextSerializer(text, many=True)
+        serializer_citation = CitationSerializer(citation, many=True)
+        data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
+                'text': serializer_text.data, 'citation': serializer_citation.data}
+        return JsonResponse(data)
+
+
+@ csrf_exempt
+@api_view(['GET', 'POST'])
+def post_detail_id(request):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    post_id = request.POST.get('post_id')
+
+    # data = json.loads(request.body.decode('utf-8'))
+    post = Post.objects.get(pk=post_id)
+    vs = post.total_visited
+    post.total_visited = vs + 1
+    post.save()
+    # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
+    #     post.total_visited + 1, post.id])
+    try:
+        text = Text.objects.filter(post=post)
+        appendist = Appendix.objects.filter(post=post)
+        citation = Citation.objects.filter(post=post)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'POST':
         serializer_post = PostSerializer(post)
         serializer_appendist = AppendixSerializer(appendist, many=True)
         serializer_text = TextSerializer(text, many=True)
