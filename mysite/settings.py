@@ -29,7 +29,10 @@ SECRET_KEY = 'django-insecure-f$tx09suq-(baomq^l%-u6^zmtw&#ts-983dg(tu-vs_-!piuy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'django-env.eba-gfusznp7.us-east-1.elasticbeanstalk.com']
+
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
