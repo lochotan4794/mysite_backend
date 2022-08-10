@@ -31,7 +31,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
-    'django-env.eba-gfusznp7.us-east-1.elasticbeanstalk.com']
+    'mysite-env1.eba-y2jpmdb6.us-east-1.elasticbeanstalk.com']
 
 
 EMAIL_USE_TLS = True
