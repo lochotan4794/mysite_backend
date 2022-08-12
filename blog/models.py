@@ -1,4 +1,3 @@
-from turtle import back, title
 from django.db import models
 from numpy import require
 from django.contrib.auth import get_user_model

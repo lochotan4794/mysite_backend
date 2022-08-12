@@ -1,6 +1,4 @@
 from copy import copy
-import email
-from turtle import pos, title
 from django.http import JsonResponse
 # Create your views here.
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView

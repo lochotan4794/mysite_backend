@@ -1,4 +1,3 @@
-from turtle import title
 from rest_framework import serializers
 from blog.models import Post, Text, Appendix, Citation, Comment, Tag
 

@@ -31,7 +31,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
-    'mysite-env1.eba-y2jpmdb6.us-east-1.elasticbeanstalk.com']
+    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1']
 
 
 EMAIL_USE_TLS = True
