@@ -21,6 +21,5 @@ COPY . .
 # informing Docker that the container listens on the
 # specified network ports at runtime i.e 8000.
 EXPOSE 8000
-docker build -t django-app:version-1 .
 # running server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
