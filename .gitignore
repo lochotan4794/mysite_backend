@@ -6,3 +6,4 @@
 .elasticbeanstalk/app_versions/*
 .env/*
 .env/
+Archive.zip
