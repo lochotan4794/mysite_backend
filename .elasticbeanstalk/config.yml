@@ -1,6 +1,6 @@
 branch-defaults:
   main:
-    environment: Backend-env
+    environment: backend-env
     group_suffix: null
 environment-defaults:
   mysite-env:
@@ -10,7 +10,7 @@ global:
   application_name: backend
   branch: null
   default_ec2_keyname: my-keypair
-  default_platform: Python 3.8
+  default_platform: Python 3.8 running on 64bit Amazon Linux 2
   default_region: us-east-1
   include_git_submodules: true
   instance_profile: null
