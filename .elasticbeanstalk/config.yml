@@ -3,9 +3,6 @@ branch-defaults:
     environment: Backend-env
     group_suffix: null
 environment-defaults:
-  Backend-env:
-    branch: null
-    repository: null
   mysite-env:
     branch: null
     repository: null
