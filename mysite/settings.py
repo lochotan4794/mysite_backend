@@ -32,7 +32,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
-    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com']
+    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de']
 
 
 EMAIL_USE_TLS = True
