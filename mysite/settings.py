@@ -110,6 +110,7 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://master.d34b9uu9514ikl.amplifyapp.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com',
