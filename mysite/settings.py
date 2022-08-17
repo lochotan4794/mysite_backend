@@ -32,25 +32,29 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
+<< << << < HEAD
     'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1']
+== == == =
+    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost']
+>> >>>> > d2ab03694e763a3d25d82edb81488571c6d9a045
 
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'htanloc994@gmail.com'
-EMAIL_HOST_PASSWORD = 'nqkyuurgdtrtjrzz'
-EMAIL_PORT = 587
+EMAIL_USE_TLS= True
+EMAIL_HOST= 'smtp.gmail.com'
+EMAIL_HOST_USER= 'htanloc994@gmail.com'
+EMAIL_HOST_PASSWORD= 'nqkyuurgdtrtjrzz'
+EMAIL_PORT= 587
 
 # Base url to serve media files
-MEDIA_URL = '/media/'
+MEDIA_URL= '/media/'
 
 # Path where media is stored
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT= os.path.join(BASE_DIR, 'media/')
 
 # users will be redirected to the home page after login
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL= 'home'
 
-SIMPLE_JWT = {
+SIMPLE_JWT= {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
@@ -99,24 +103,24 @@ INSTALLED_APPS = [
 ]
 
 if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE= 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE= 'storages.backends.s3boto3.S3Boto3Storage'
 
-    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-    AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
+    AWS_STORAGE_BUCKET_NAME= os.environ['AWS_STORAGE_BUCKET_NAME']
+    AWS_S3_REGION_NAME= os.environ['AWS_S3_REGION_NAME']
 
-    AWS_S3_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-    AWS_S3_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+    AWS_S3_ACCESS_KEY_ID= os.environ['AWS_ACCESS_KEY_ID']
+    AWS_S3_SECRET_ACCESS_KEY= os.environ['AWS_SECRET_ACCESS_KEY']
 
-CORS_ALLOWED_ORIGINS = [
+CORS_ALLOWED_ORIGINS= [
     'http://localhost:3000',
     'https://master.d34b9uu9514ikl.amplifyapp.com',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com',
+CSRF_TRUSTED_ORIGINS= ['https://*.mydomain.com',
                         'https://*.127.0.0.1', 'https://master.d34b9uu9514ikl.amplifyapp.com']
 
-MIDDLEWARE = [
+MIDDLEWARE= [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -158,13 +162,36 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     }
 # }
 
+# if 'RDS_DB_NAME' in os.environ:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': os.environ['RDS_DB_NAME'],
+#             'USER': os.environ['RDS_USERNAME'],
+#             'PASSWORD': os.environ['RDS_PASSWORD'],
+#             'HOST': os.environ['RDS_HOSTNAME'],
+#             'PORT': os.environ['RDS_PORT'],
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': 'postgres',
+#             'USER': 'postgres',
+#             'PASSWORD': 'Password4794',
+#             'HOST': 'localhost',
+#             'PORT': '5433',
+#         }
+#     }
+
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'NAME': os.environ['CONFIG_DB_NAME'],
+            'USER': os.environ['CONFIG_USERNAME'],
+            'PASSWORD': os.environ['CONFIG_PASSWORD'],
             'HOST': os.environ['RDS_HOSTNAME'],
             'PORT': os.environ['RDS_PORT'],
         }
