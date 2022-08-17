@@ -32,7 +32,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
-    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de']
+    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost']
 
 
 EMAIL_USE_TLS = True
@@ -158,11 +158,34 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     }
 # }
 
+# if 'RDS_DB_NAME' in os.environ:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': os.environ['RDS_DB_NAME'],
+#             'USER': os.environ['RDS_USERNAME'],
+#             'PASSWORD': os.environ['RDS_PASSWORD'],
+#             'HOST': os.environ['RDS_HOSTNAME'],
+#             'PORT': os.environ['RDS_PORT'],
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': 'postgres',
+#             'USER': 'postgres',
+#             'PASSWORD': 'Password4794',
+#             'HOST': 'localhost',
+#             'PORT': '5433',
+#         }
+#     }
+
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
+            'NAME': os.environ['CONFIG_DB_NAME'],
             'USER': os.environ['RDS_USERNAME'],
             'PASSWORD': os.environ['RDS_PASSWORD'],
             'HOST': os.environ['RDS_HOSTNAME'],
