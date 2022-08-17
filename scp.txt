@@ -1,0 +1,2 @@
+scp -i "my-keypair.pem" root@ec2-54-152-252-176.compute-1.amazonaws.com:/var/app/current/debug.log ./
+ssh -i "my-keypair.pem" root@ec2-54-152-252-176.compute-1.amazonaws.com
