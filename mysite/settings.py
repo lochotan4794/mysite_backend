@@ -32,7 +32,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
-    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost']
+    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1']
 
 
 EMAIL_USE_TLS = True
@@ -158,29 +158,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     }
 # }
 
-# if 'RDS_DB_NAME' in os.environ:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             'NAME': os.environ['RDS_DB_NAME'],
-#             'USER': os.environ['RDS_USERNAME'],
-#             'PASSWORD': os.environ['RDS_PASSWORD'],
-#             'HOST': os.environ['RDS_HOSTNAME'],
-#             'PORT': os.environ['RDS_PORT'],
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             'NAME': 'postgres',
-#             'USER': 'postgres',
-#             'PASSWORD': 'Password4794',
-#             'HOST': 'localhost',
-#             'PORT': '5433',
-#         }
-#     }
-
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
@@ -203,6 +180,54 @@ else:
             'PORT': '5433',
         }
     }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# if 'RDS_DB_NAME' in os.environ:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             # 'NAME': 'postgres',
+#             'NAME': 'backup',
+#             'USER': 'postgres',
+#             # 'PASSWORD': 'Password4794',
+#             'PASSWORD': 'postgres',
+#             # 'HOST': 'localhost',
+#             'HOST': 'awseb-e-e2p9hvfz4c-stack-awsebrdsdatabase-rssxq6bgxjyx.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+#             'PORT': '5432',
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             # 'NAME': 'postgres',
+#             'NAME': 'backup',
+#             'USER': 'postgres',
+#             # 'PASSWORD': 'Password4794',
+#             'PASSWORD': 'postgres',
+#             # 'HOST': 'localhost',
+#             'HOST': 'awseb-e-e2p9hvfz4c-stack-awsebrdsdatabase-rssxq6bgxjyx.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+#             'PORT': '5432',
+#         }
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
