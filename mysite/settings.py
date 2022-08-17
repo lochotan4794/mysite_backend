@@ -181,6 +181,25 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #         }
 #     }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
