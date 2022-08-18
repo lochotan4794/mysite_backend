@@ -159,24 +159,24 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # }
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': 'debug.log',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
 
 # if 'RDS_DB_NAME' in os.environ:
 #     DATABASES = {
@@ -219,14 +219,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            # 'NAME': 'postgres',
-            'NAME': 'backup',
+            'NAME': 'postgres',
             'USER': 'postgres',
-            # 'PASSWORD': 'Password4794',
-            'PASSWORD': 'postgres',
-            # 'HOST': 'localhost',
-            'HOST': 'awseb-e-e2p9hvfz4c-stack-awsebrdsdatabase-rssxq6bgxjyx.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
-            'PORT': '5432',
+            'PASSWORD': 'Password4794',
+            'HOST': 'localhost',
+            'PORT': '5433',
         }
     }
 

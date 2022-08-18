@@ -1,6 +1,6 @@
 branch-defaults:
   main:
-    environment: backend-env
+    environment: backend-env-dev
     group_suffix: null
 environment-defaults:
   mysite-env:

@@ -8,7 +8,6 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
-from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -35,12 +34,17 @@ def edit_profile(request):
 @csrf_exempt
 def login_user(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = auth.authenticate(username=username, password=password)
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        email = request.POST.get('email', None)
+        if username is not None:
+            user = auth.authenticate(username=username, password=password)
+        if email is not None:
+            name = User.objects.get(email=email)
+            user = auth.authenticate(username=name, password=password)
         if user is not None:
             auth.login(request, user)
-            uid = User.objects.get(username=username)
+            uid = User.objects.get(username=user.username)
             data = UserSerializer(uid).data
             return JsonResponse(data, safe=False)
         else:
