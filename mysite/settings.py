@@ -211,7 +211,7 @@ if 'RDS_DB_NAME' in os.environ:
             # 'PASSWORD': 'Password4794',
             'PASSWORD': 'postgres',
             # 'HOST': 'localhost',
-            'HOST': 'awseb-e-e2p9hvfz4c-stack-awsebrdsdatabase-rssxq6bgxjyx.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'HOST': 'awseb-e-ttj3emmps3-stack-awsebrdsdatabase-xg2mjvb7raw3.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
         }
     }
