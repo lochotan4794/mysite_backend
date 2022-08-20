@@ -110,7 +110,7 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://master.d34b9uu9514ikl.amplifyapp.com',
+    'https://master.d8vadauh948tl.amplifyapp.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com',
@@ -219,7 +219,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'postgres',
+            'NAME': 'backup',
             'USER': 'postgres',
             'PASSWORD': 'Password4794',
             'HOST': 'localhost',
