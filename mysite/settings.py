@@ -31,8 +31,8 @@ SECRET_KEY = 'django-insecure-f$tx09suq-(baomq^l%-u6^zmtw&#ts-983dg(tu-vs_-!piuy
 DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = [
-    'Backend-env.eba-7xrrvaa3.us-east-1.elasticbeanstalk.com', 'backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64',
+                 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*']
 
 
 EMAIL_USE_TLS = True
@@ -113,8 +113,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://master.d8vadauh948tl.amplifyapp.com',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com',
-                        'https://*.127.0.0.1', 'https://master.d34b9uu9514ikl.amplifyapp.com']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.127.0.0.1', 'https://master.d34b9uu9514ikl.amplifyapp.com']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
