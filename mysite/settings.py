@@ -114,7 +114,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.127.0.0.1', 'https://master.d34b9uu9514ikl.amplifyapp.com']
+    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
