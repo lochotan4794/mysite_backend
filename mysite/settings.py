@@ -206,7 +206,7 @@ if 'RDS_DB_NAME' in os.environ:
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             # 'NAME': 'postgres',
-            'NAME': 'backup',
+            'NAME': os.environ['DEV_DB_NAME'],
             'USER': 'postgres',
             # 'PASSWORD': 'Password4794',
             'PASSWORD': 'postgres',
