@@ -1,12 +1,19 @@
 from rest_framework import serializers
-from blog.models import Post, Text, Appendix, Citation, Comment, Tag
+from blog.models import Post, Text, Appendix, Citation, Comment, Tag, Style
+
+
+class StyleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Style
+        fields = ('name', 'indentLevel', 'fontSize', 'decor')
 
 
 class TextSerializer(serializers.ModelSerializer):
+    # style = StyleSerializer()
     class Meta:
         model = Text
-        fields = ('title', 'link', 'content',
-                  'fontSize', 'indent', 'decor', 'cssId', 'image', 'type')
+        fields = ( 'link', 'content',
+                   'image', 'type', 'cssId')
 
 
 class AppendixSerializer(serializers.ModelSerializer):

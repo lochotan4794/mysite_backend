@@ -2,12 +2,12 @@ from copy import copy
 from django.http import JsonResponse
 # Create your views here.
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from blog.serializers import AppendixSerializer, CitationSerializer, PostSerializer, TextSerializer, CommentSerializer, TagSerializer
+from blog.serializers import AppendixSerializer, CitationSerializer, PostSerializer, TextSerializer, CommentSerializer, TagSerializer, StyleSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.shortcuts import get_object_or_404, render
-from .models import Post, Text, Appendix, Citation, Comment, Tag, Relationship
+from .models import Post, Style, Text, Appendix, Citation, Comment, Tag, Relationship
 # from .forms import ImageForm
 import distance
 import numpy as np
@@ -166,6 +166,11 @@ def post_detail(request, slug):
         text = Text.objects.filter(post=post)
         appendist = Appendix.objects.filter(post=post)
         citation = Citation.objects.filter(post=post)
+        styles = []
+        for item in text.iterator():
+            style = Style.objects.filter(name=item.type)[0]
+            data = StyleSerializer(style).data
+            styles.append(data)
     except Post.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -175,7 +180,8 @@ def post_detail(request, slug):
         serializer_text = TextSerializer(text, many=True)
         serializer_citation = CitationSerializer(citation, many=True)
         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
-                'text': serializer_text.data, 'citation': serializer_citation.data}
+                'text': serializer_text.data, 'citation': serializer_citation.data,
+                'styles': styles}
         return JsonResponse(data)
 
 
@@ -198,6 +204,11 @@ def post_detail_id(request):
         text = Text.objects.filter(post=post)
         appendist = Appendix.objects.filter(post=post)
         citation = Citation.objects.filter(post=post)
+        styles = []
+        for item in text.iterator():
+            style = Style.objects.filter(name=item.type)[0]
+            data = StyleSerializer(style).data
+            styles.append(data)
     except Post.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -207,7 +218,7 @@ def post_detail_id(request):
         serializer_text = TextSerializer(text, many=True)
         serializer_citation = CitationSerializer(citation, many=True)
         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
-                'text': serializer_text.data, 'citation': serializer_citation.data}
+                'text': serializer_text.data, 'citation': serializer_citation.data, 'styles': styles}
         return JsonResponse(data)
 
 

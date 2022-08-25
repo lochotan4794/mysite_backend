@@ -25,11 +25,18 @@ TEXT_DECORATION = (
 )
 
 TEXT_FUNCTIONAL = (
-    (0, "image"),
-    (1, "paragraph"),
+    (0, "paragraph"),
+    (1, "image"),
     (2, "header"),
     (3, "link")
 )
+
+function_to_index = {
+    0:  "paragraph",
+    1:  "image",
+    2: "header",
+    3: "link"
+}
 
 
 class Post(models.Model):
@@ -61,21 +68,17 @@ class Text(models.Model):
         related_name="text",
         related_query_name="text",
     )
-    title = models.CharField(max_length=200, unique=True, blank=True)
     content = models.TextField(blank=True)
-    link = models.CharField(max_length=200, blank=True)
-    fontSize = models.IntegerField(default=24)
-    indent = models.IntegerField(default=0)
-    decor = models.IntegerField(choices=TEXT_DECORATION, default=0)
+    link = models.CharField(max_length=100, blank=True)
     type = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
-    cssId = models.CharField(max_length=200, blank=True)
     image = models.ImageField(upload_to='images', blank=True)
+    cssId = models.IntegerField(default=0)
 
     class Meta:
-        ordering = ['title']
+        ordering = ['content']
 
     def __str__(self):
-        return self.title
+        return self.content
 
 
 class Tag(models.Model):
@@ -111,6 +114,22 @@ class Relationship(models.Model):
         Post, on_delete=models.CASCADE, related_name='relationship')
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE,
                             related_name='relationship')
+
+
+class Style(models.Model):
+    # text = models.ForeignKey(
+    #     Text,
+    #     on_delete=models.CASCADE,
+    #     related_name="style",
+    #     related_query_name="style",
+    # )
+    name = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
+    indentLevel = models.IntegerField(default=0)
+    fontSize = models.IntegerField(default=24)
+    decor = models.IntegerField(choices=TEXT_DECORATION, default=0)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Appendix(models.Model):
