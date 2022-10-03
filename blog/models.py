@@ -1,7 +1,9 @@
 from django.db import models
-from numpy import require
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.postgres.fields import ArrayField
+
 
 # Create your models here.
 # from django.contrib.auth.models import User
@@ -28,7 +30,19 @@ TEXT_FUNCTIONAL = (
     (0, "paragraph"),
     (1, "image"),
     (2, "header"),
-    (3, "link")
+    (3, "link"),
+    (4, "citation"),
+    (5, "appendix"),
+    (6, "h1"),
+    (7, "h2"),
+    (8, "h3"),
+    (9, "h4")
+)
+
+COMPONENT = (
+    (0, "Appendix"),
+    (1, "Text"),
+    (2, "Citation"),
 )
 
 function_to_index = {
@@ -37,6 +51,7 @@ function_to_index = {
     2: "header",
     3: "link"
 }
+
 
 
 class Post(models.Model):
@@ -53,6 +68,11 @@ class Post(models.Model):
     eng_ver = models.ForeignKey(
         'Post', on_delete=models.CASCADE, null=True, blank=True)
     lang = models.IntegerField(choices=LANG, default=0)
+    video = models.CharField(max_length=200, blank=True)
+    pdf = models.FileField(upload_to='pdf', blank=True)
+    previous_post=models.OneToOneField('self', null=True, blank=True, related_name='previous', on_delete=models.CASCADE)
+    next_post=models.OneToOneField('self', null=True, blank=True, related_name='next', on_delete=models.CASCADE)
+    
 
     class Meta:
         ordering = ['-created_on']
@@ -60,6 +80,19 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+    @classmethod
+    def create(cls, title, slug, thumnail, abstract, updated_on, created_on, status, total_visited, eng_ver, lang):
+        post = cls(title=title, slug=slug, thumnail=thumnail, abstract=abstract, updated_on=updated_on, created_on=created_on, status=status, total_visited=total_visited, eng_ver=eng_ver, lang=lang)
+        # do something with the book
+        return post
+
+class Index(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='index')
+    position = models.IntegerField(default=0)
+    type = models.IntegerField(default=0)
+    id_type = models.IntegerField(choices=COMPONENT, default=0)
+    style_id = models.IntegerField(choices=TEXT_FUNCTIONAL)
 
 class Text(models.Model):
     post = models.ForeignKey(
@@ -68,22 +101,46 @@ class Text(models.Model):
         related_name="text",
         related_query_name="text",
     )
+    previous=models.OneToOneField('self', null=True, blank=True, related_name='next', on_delete=models.CASCADE)
     content = models.TextField(blank=True)
     link = models.CharField(max_length=100, blank=True)
-    type = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
+    role = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
     image = models.ImageField(upload_to='images', blank=True)
     cssId = models.IntegerField(default=0)
-
+    # index = models.ForeignKey(
+    #     Index,
+    #     on_delete=models.CASCADE,
+    #     related_name="text",
+    #     related_query_name="text",
+    # )
+    # date_created = models.DateTimeField(default=datetime.now(), blank=True)
+    @classmethod
+    def create(cls, post, previous, content, link, role, image, cssId):
+        text = cls(post=post, previous=previous, content=content, link=link, role=role, image=image, cssId=cssId)
+        # do something with the book
+        return text
+    
     class Meta:
         ordering = ['content']
 
     def __str__(self):
         return self.content
 
+    # def save(self, *args, **kwargs):
+    #     p = Post.objects.filter(post=self.post)
+    #     p.board.append(self.id)
+    #     super(Text, self).save(*args, **kwargs)
+
+class Order(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='order')
+    kind = models.IntegerField(default=0, choices=COMPONENT)
+    kind_id = models.IntegerField(default=0)
+    order_id = models.IntegerField(default=0)
 
 class Tag(models.Model):
-    post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name='tag')
+    # post = models.ForeignKey(
+    #     Post, on_delete=models.CASCADE, related_name='tag', blank=True)
     title = models.CharField(max_length=200, blank=True)
     # id = models.AutoField(primary_key=True)
 
@@ -103,6 +160,12 @@ class Tag(models.Model):
             return self is other
         return title == other.title
 
+    @classmethod
+    def create(cls, title):
+        app = cls(title=title)
+        # do something with the book
+        return app
+
 
 # class Membership(models.Model):
 #     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -114,6 +177,12 @@ class Relationship(models.Model):
         Post, on_delete=models.CASCADE, related_name='relationship')
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE,
                             related_name='relationship')
+
+    @classmethod
+    def create(cls, tag, post):
+        app = cls(tag=tag, post=post)
+        # do something with the book
+        return app
 
 
 class Style(models.Model):
@@ -130,9 +199,13 @@ class Style(models.Model):
 
     def __str__(self):
         return str(self.name)
+    
+    class Meta:
+        ordering = ['name']
 
 
 class Appendix(models.Model):
+    previous=models.OneToOneField('self', null=True, blank=True, related_name='next', related_query_name='next', on_delete=models.CASCADE, unique=False)
     text = models.CharField(max_length=200, default="")
     indentLevel = models.IntegerField(default=0)
     link = models.CharField(max_length=200, default="")
@@ -146,8 +219,19 @@ class Appendix(models.Model):
     def __str__(self):
         return self.text
 
+    def has_related_object(self):
+        return hasattr(self, 'next') and self.next is not None
+
+    @classmethod
+    def create(cls, previous, text, indentLevel, link, post):
+        app = cls(previous=previous,text=text, indentLevel=indentLevel, link=link, post=post)
+        # do something with the book
+        return app
+    
+
 
 class Citation(models.Model):
+    previous=models.OneToOneField('self', null=True, blank=True, related_name='next', on_delete=models.CASCADE)
     text = models.CharField(max_length=200, default="")
     post = models.ForeignKey(
         Post,
@@ -158,6 +242,12 @@ class Citation(models.Model):
 
     def __str__(self):
         return self.text
+
+    @classmethod
+    def create(cls, post, previous, text):
+        citation = cls(post=post, previous=previous, text=text)
+        # do something with the book
+        return citation
 
 
 class PublishedManager(models.Manager):
@@ -199,3 +289,4 @@ class Comment(models.Model):
 
 #     def __str__(self):
 #         return self.title
+

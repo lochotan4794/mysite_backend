@@ -1,19 +1,26 @@
 from copy import copy
+import json
+from time import time
 from django.http import JsonResponse
 # Create your views here.
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from blog.serializers import AppendixSerializer, CitationSerializer, PostSerializer, TextSerializer, CommentSerializer, TagSerializer, StyleSerializer
+from rest_framework.generics import ListCreateAPIView
+from blog.serializers import AppendixSerializer, CitationSerializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
 from django.shortcuts import get_object_or_404, render
-from .models import Post, Style, Text, Appendix, Citation, Comment, Tag, Relationship
+from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag
 # from .forms import ImageForm
 import distance
 import numpy as np
 from django.contrib.auth.models import User
-import json
 from rest_framework.decorators import api_view
+import datetime
+from django.db.models import Q
+from django.template.defaultfilters import slugify
+from django.db.models import CharField
+# from django.db.models.functions import Search
+
+# CharField.register_lookup(Search)
 
 
 def list_to_queryset(model, data):
@@ -86,9 +93,17 @@ def post_list_recent(request):
 def post_list_tag(request, t):
     if request.method == 'GET':
         tag = get_object_or_404(Tag, title=t)
-        posts = Post.objects.filter(tag=tag)
+        # print("Hah ha ha")
+        # print(tag)
+        # posts = Post.objects.filter(tag=tag)
+        relationship = get_object_or_404(Relationship, tag=tag)
+        posts = Post.objects.filter(pk=relationship.post.id)
+        # print(posts)
         serializer_post = PostSerializer(posts, many=True)
-        return JsonResponse(serializer_post.data, safe=False)
+        tags = Tag.objects.all()
+        serializer_tag = TagSerializer(tags, many=True)
+        response = {"tags": serializer_tag.data, "post": serializer_post.data}
+        return JsonResponse(response)
 
 
 @ csrf_exempt
@@ -127,7 +142,10 @@ def post_list_relative(request, slug):
         #         relative = Post.objects.filter(pk=r.values_list("post_id"))
         #         posts = posts | relative
         # # print(tags[0])
-        selected = posts[:5]
+        if len(posts) > 4:
+            selected = posts[:5]
+        else:
+            selected = posts
         serializer_post = PostSerializer(selected, many=True)
         return JsonResponse(serializer_post.data, safe=False)
         # return JsonResponse([], safe=False)
@@ -135,20 +153,437 @@ def post_list_relative(request, slug):
 
 @ csrf_exempt
 def post_list(request):
-    if request.method == 'GET':
-        posts = Post.objects.all()
+    if request.method == 'POST':
+        posts = Post.objects.all().filter(~Q(title="Dummy"))
+        tags = Tag.objects.all()
+        # tags = []
+        # for pos in posts:
+        #     try:
+        #         t = Relationship.objects.filter(post=pos)
+        #     except Relationship.DoesNotExist:
+        #         t = None
+        #     tags.append(t)
         serializer_post = PostSerializer(posts, many=True)
-        return JsonResponse(serializer_post.data, safe=False)
+        # rel = [r for r in serializer_post.data.relationship]
+        # print(rel)
+        serializer_tag = TagSerializer(tags, many=True)
+        response = {"tags": serializer_tag.data, "post": serializer_post.data}
+        return JsonResponse(response)
 
 
 @ csrf_exempt
 def post_list_for_key(request):
     if request.method == 'POST':
         key = request.POST['key']
-        posts = Post.objects.all()
+        posts = Post.objects.all().filter(~Q(title="Dummy"))
         selected_posts = get_search_list(posts, key=key)
+        tags = Tag.objects.all()
+        serializer_tag = TagSerializer(tags, many=True)
         serializer_post = PostSerializer(selected_posts, many=True)
-        return JsonResponse(serializer_post.data, safe=False)
+        response = {"tags": serializer_tag.data, "post": serializer_post.data}
+        return JsonResponse(response)
+
+
+@ csrf_exempt
+def admin_dummy(request):
+    try:
+        post = Post.objects.filter(title="Dummy")
+    except Post.DoesNotExist:
+        post = Post.create(title="Dummy", slug="Dummy", thumnail=None, abstract="Dummny", updated_on=datetime.datetime.now(
+        ), created_on=datetime.datetime.now(), status="CRAFT", total_visited=0, eng_ver=None, lang="ENG")
+        post.save()
+    serializer_app = AppendixSerializer(post, many=False)
+    return JsonResponse(serializer_app.data)
+
+
+@ csrf_exempt
+def admin_removetag(request):
+    slug = request.POST['slug']
+    tag_t = request.POST['tag']
+    post = get_object_or_404(Post, slug=slug)
+    tag = Tag.objects.get()
+    relas = Relationship.objects.filter(post=post, )
+    tag_list = []
+    for r in relas:
+        if tag_t == r.tag.title:
+            r.delete()
+        else:
+            tag_list.append(Tag.objects.get(title=r.tag.title).title)
+    return JsonResponse(tag_list, safe=False)
+
+@ csrf_exempt
+def admin_setnext(request):
+    slug = request.POST['slug']
+    next_slug = request.POST['nextSlug']
+    post = get_object_or_404(Post, slug=slug)
+    next = get_object_or_404(Post, slug=next_slug)
+    post.next_post = next
+    post.save()
+    json_response = {"result": "ok"}
+    return JsonResponse(json_response, safe=False)
+
+@ csrf_exempt
+def admin_setprevious(request):
+    slug = request.POST['slug']
+    next_slug = request.POST['preSlug']
+    post = get_object_or_404(Post, slug=slug)
+    next = get_object_or_404(Post, slug=next_slug)
+    post.previous_post = next
+    post.save()
+    json_response = {"result": "ok"}
+    return JsonResponse(json_response, safe=False)
+
+@ csrf_exempt
+def admin_taglist(request):
+    tags = Tag.objects.all()
+    data = TagSerializer(tags)
+    return JsonResponse(data=data.data, safe=False)
+
+
+@ csrf_exempt
+def admin_add(request):
+    slug = request.POST['slug']
+    print("Slug here")
+    print(slug)
+    # if slug == "Dummy":
+    #     slug = slugify(request.POST['title']).lower()
+    post = get_object_or_404(Post, slug=slug)
+    type = request.POST['type']
+    previous = None
+    if 'tags' in request.POST:
+        for t in request.POST['tags']:
+            try:
+                tag = tag.object.filter(title=t)
+            except Tag.DoesNotExist:
+                tag = Tag.create(post=post, title=t)
+            rel = Relationship.create(tag, post=post)
+            rel.save()
+
+    if (type == "text"):
+        content = request.POST['content']
+        link = request.POST['link']
+        if 'image' in request.FILES:
+            image = request.FILES['image']
+        else:
+            image = None
+        cssId = request.POST['cssId']
+        role = request.POST['role']
+        text = Text.create(post, previous, content, link, role, image, cssId)
+        text.save()
+        serializer_text = TextSerializer(text, many=False)
+        return JsonResponse(serializer_text.data)
+    if (type == "citation"):
+        text = request.POST['text']
+        citation = Citation.create(post, previous, text)
+        citation.save()
+        serializer_citation = CitationSerializer(citation, many=False)
+        return JsonResponse(serializer_citation.data)
+    if (type == "appendix"):
+        indentLevel = request.POST['indentLevel']
+        link = request.POST['link']
+        text = request.POST['text']
+        app = Appendix.create(previous, text, indentLevel, link, post)
+        app.save()
+        serializer_app = AppendixSerializer(app, many=False)
+        return JsonResponse(serializer_app.data)
+
+
+@ csrf_exempt
+def admin_update(request):
+    type = request.POST['type']
+    id = request.POST['id']
+    if (type == "text"):
+        text = Text.objects.get(id=id)
+        content = request.POST['content']
+        link = request.POST['link']
+        if 'image' in request.FILES:
+            image = request.FILES['image']
+        else:
+            image = None
+        cssId = request.POST['cssId']
+        role = request.POST['role']
+        text.role = role
+        text.content = content
+        text.link = link
+        text.image = image
+        text.cssId = cssId
+        text.save()
+    if (type == "citation"):
+        text = request.POST['text']
+        citation = Citation.objects.get(id=id)
+        citation.text = text
+        citation.save()
+    if (type == "appendix"):
+        indentLevel = request.POST['indentLevel']
+        link = request.POST['link']
+        text = request.POST['text']
+        app = Appendix.objects.get(id=id)
+        app.indentLevel = indentLevel
+        app.link = link
+        app.text = text
+        app.save()
+    jsondata = {"result": "ok"}
+    return JsonResponse(jsondata)
+
+
+@ csrf_exempt
+def admin_delete(request):
+    type = request.POST['type']
+    id = request.POST['id']
+    if (type == "text"):
+        try:
+            curr = Text.objects.get(id=id)
+        except Text.DoesNotExist:
+            curr = None
+        try:
+            next = Text.objects.get(previous=id)
+        except Text.DoesNotExist:
+            next = None
+        if curr is not None and next is not None:
+            if curr.previous is None:
+                next.previous = None
+                next.save()
+                curr.delete()
+            if curr.previous is not None and next is not None:
+                next.previous = curr.previous
+                curr.delete()
+                next.save()
+        if next is None and curr is not None:
+            curr.delete()
+    if (type == "citation"):
+        try:
+            curr = Citation.objects.get(id=id)
+        except Citation.DoesNotExist:
+            curr = None
+        try:
+            next = Citation.objects.get(previous=id)
+        except Citation.DoesNotExist:
+            next = None
+        if curr is not None and next is not None:
+            if curr.previous is None:
+                next.previous = None
+                next.save()
+                curr.delete()
+                print("delete1")
+            if curr.previous is not None and next is not None:
+                next.previous = curr.previous
+                curr.delete()
+                next.save()
+                print("delete2")
+        if next is None and curr is not None:
+            curr.delete()
+            print("delete3")
+    if (type == "appendix"):
+        try:
+            curr = Appendix.objects.get(id=id)
+        except Appendix.DoesNotExist:
+            curr = None
+        try:
+            next = Appendix.objects.get(previous=id)
+        except Appendix.DoesNotExist:
+            next = None
+        if curr is not None and next is not None:
+            if curr.previous is None:
+                next.previous = None
+                next.save()
+                curr.delete()
+            if curr.previous is not None and next is not None:
+                next.previous = curr.previous
+                curr.delete()
+                next.save()
+        if next is None and curr is not None:
+            curr.delete()
+
+    jsondata = {"result": "ok"}
+    return JsonResponse(jsondata)
+
+
+@ csrf_exempt
+def admin_delete_post(request):
+    slug = request.POST['slug']
+    post = Post.objects.get(slug=slug)
+    rel = Relationship.objects.filter(post=post)
+    rel.delete()
+    post.delete()
+    response = {"result": "ok"}
+    return JsonResponse(response)
+
+
+@ csrf_exempt
+def admin_search_post(request):
+    key_search = request.POST["key"]
+    posts = Post.objects.filter(title__icontains=key_search)
+    tags = Tag.objects.all()
+    serializer_post = PostSerializer(posts, many=True)
+    serializer_tag = TagSerializer(tags, many=True)
+    response = {"tags": serializer_tag.data, "post": serializer_post.data}
+    return JsonResponse(response)
+
+
+@ csrf_exempt
+def admin_side(request):
+    slug = request.POST['slug']
+    if slug == "Dummy":
+        slug = slugify(request.POST['title']).lower()
+
+    try:
+        post = Post.objects.get(slug=slug)
+    except Post.DoesNotExist:
+        post = Post.create(title="Dummy", slug=slug, thumnail=None, abstract="Dummy", updated_on=datetime.datetime.now(
+        ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0)
+
+    post.title = request.POST['title']
+    post.slug = slug
+
+    if request.method == 'POST':
+        post.abstract = request.POST['abstract']
+        if 'status' in request.POST['slug']:
+            post.status = request.POST['status']
+        if 'thumnail' in request.FILES:
+            post.thumnail = request.FILES['thumnail']
+        if 'tag' in request.POST:
+            tag_data = request.POST['tag']
+        if 'pdf' in request.POST:
+            post.pdf = request.POST['pdf']
+        if 'video' in request.POST:
+            post.video = request.POST['video']
+        tags = json.loads(tag_data)
+        for t in tags["data"]:
+            # print(t)
+            try:
+                t_obj = Tag.objects.get(title=t)
+                try:
+                    r = Relationship.objects.get(tag=t_obj, post=post)
+                except Relationship.DoesNotExist:
+                    r = Relationship.create(tag=t_obj, post=post)
+                    r.save()
+            except Tag.DoesNotExist:
+                t_obj = Tag.create(title=t)
+                t_obj.save()
+                try:
+                    r = Relationship.objects.get(tag=t_obj, post=post)
+                except Relationship.DoesNotExist:
+                    r = Relationship.create(tag=t_obj, post=post)
+                    r.save()
+
+        if 'lang' in request.POST:
+            post.lang = request.POST['lang']
+
+        if 'eng_ver' in request.POST:
+            try:
+                eng_ver = Post.objects.get(slug=request.POST['eng_ver'])
+            except Post.DoesNotExist:
+                eng_ver = None
+            post.eng_ver = eng_ver
+        post.save()
+        jsondata = {"slug": slug}
+        return JsonResponse(jsondata)
+
+
+@ csrf_exempt
+def admin_insert(request):
+    slug = request.POST['slug']
+    post = get_object_or_404(Post, slug=slug)
+    type = request.POST['type']
+    id = request.POST['id']
+    if (type == "text"):
+        previous = Text.objects.get(id=id)
+        content = request.POST['content']
+        link = request.POST['link']
+        if 'image' in request.FILES:
+            image = request.FILES['image']
+        else:
+            image = None
+        cssId = request.POST['cssId']
+        role = request.POST['role']
+        try:
+            next = Text.objects.get(previous=id)
+        except Text.DoesNotExist:
+            next = None
+        if next is not None:
+            next.previous = None
+            next.save()
+        text = Text.create(post, previous, content, link, role, image, cssId)
+        text.save()
+        if next is not None and next.id != text.id:
+            next.previous = text
+            next.save()
+        serializer_app = TextSerializer(text, many=False)
+        return JsonResponse(serializer_app.data)
+    if (type == "citation"):
+        previous = Citation.objects.get(id=id)
+        text = request.POST['text']
+        try:
+            next = Citation.objects.get(previous=id)
+        except Citation.DoesNotExist:
+            next = None
+        if next is not None:
+            next.previous = None
+            next.save()
+        citation = Citation.create(post, previous, text)
+        citation.save()
+        if next is not None and next.id != citation.id:
+            next.previous = citation
+            next.save()
+        serializer_app = CitationSerializer(citation, many=False)
+        return JsonResponse(serializer_app.data)
+    if (type == "appendix"):
+        previous = Appendix.objects.get(id=id)
+        indentLevel = request.POST['indentLevel']
+        link = request.POST['link']
+        text = request.POST['text']
+        try:
+            next = Appendix.objects.get(previous=id)
+        except Appendix.DoesNotExist:
+            next = None
+        if next is not None:
+            next.previous = None
+            next.save()
+        app = Appendix.create(previous, text, indentLevel, link, post)
+        app.save()
+        if next is not None and next.id != app.id:
+            next.previous = app
+            next.save()
+        serializer_app = AppendixSerializer(app, many=False)
+        return JsonResponse(serializer_app.data)
+
+# @ csrf_exempt
+# def post_detail1(request, slug):
+#     """
+#     Retrieve, update or delete a code snippet.
+#     """
+#     post = get_object_or_404(Post, slug=slug)
+#     vs = post.total_visited
+#     post.total_visited = vs + 1
+#     post.save()
+#     # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
+#     #     post.total_visited + 1, post.id])
+#     try:
+#         text = Text.objects.filter(post=post)
+#         appendist = Appendix.objects.filter(post=post)
+#         citation = Citation.objects.filter(post=post)
+#         styles = Style.objects.all()
+#         # print(styles)
+#     except Post.DoesNotExist:
+#         return HttpResponse(status=404)
+
+#     if request.method == 'GET':
+#         serializer_post = PostSerializer(post)
+#         serializer_appendist = AppendixSerializer(appendist, many=True)
+#         serializer_text = TextSerializer(text, many=True)
+#         serializer_citation = CitationSerializer(citation, many=True)
+#         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
+#                 'text': serializer_text.data, 'citation': serializer_citation.data,
+#                 'styles': styles}
+#         return JsonResponse(data)
+
+
+def checkNext(Model, id):
+    try:
+        Model.objects.get(previous=id)
+        return True
+    except Model.DoesNotExist:
+        return False
 
 
 @ csrf_exempt
@@ -156,32 +591,129 @@ def post_detail(request, slug):
     """
     Retrieve, update or delete a code snippet.
     """
+    # Get Dummy object
+    print("Recieved Slug")
+    print(slug)
+    if slug == "Dummy":
+        try:
+            dummy = Post.objects.get(title="Dummy")
+        except Post.DoesNotExist:
+            dummy = Post.create(title="Dummy", slug="Dummy", thumnail=None, abstract="Dummy", updated_on=datetime.datetime.now(
+            ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0)
+            dummy.save()
+        serializer_app = PostSerializer(dummy, many=False)
+        data = {'post': serializer_app.data, 'appendix': [],
+                'text': [], 'citation': [],
+                'styles': []}
+        return JsonResponse(data)
+
     post = get_object_or_404(Post, slug=slug)
+
     vs = post.total_visited
     post.total_visited = vs + 1
     post.save()
+    texts = list()
+    appendists = list()
+    citations = list()
     # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
     #     post.total_visited + 1, post.id])
+    relas = Relationship.objects.filter(post=post)
+    for r in relas:
+        print(r.tag)
+
     try:
-        text = Text.objects.filter(post=post)
-        appendist = Appendix.objects.filter(post=post)
-        citation = Citation.objects.filter(post=post)
-        styles = []
-        for item in text.iterator():
-            style = Style.objects.filter(name=item.type)[0]
-            data = StyleSerializer(style).data
-            styles.append(data)
+        text = Text.objects.filter(post=post).filter(previous__isnull=True)
+        appendist = Appendix.objects.filter(
+            post=post).filter(previous__isnull=True)
+        citation = Citation.objects.filter(
+            post=post).filter(previous__isnull=True)
+
+        relationship = Relationship.objects.filter(post=post)
+
     except Post.DoesNotExist:
         return HttpResponse(status=404)
 
+    for t in text:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            series_t.append(t.id)
+        texts.append(series_t)
+
+    Rs = []
+    for r in relationship:
+        Rs.append(r.tag.title)
+
+    for t in appendist:
+        series_t = list()
+        series_t.append(t.id)
+        # while(hasattr(t, 'next')):
+        while(hasattr(t, 'next')):
+            t = t.next
+        # while(checkNext(Appendix, t.id)):
+        #     t = Appendix.objects.get(previous=t.id)
+            print("next object")
+            print(t)
+            series_t.append(t.id)
+        appendists.append(series_t)
+
+    for t in citation:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            series_t.append(t.id)
+        citations.append(series_t)
+
+    # print("LIST")
+    # print(appendists[0])
+
+    # print(citations)
+
+    styles = []
+    styles = Style.objects.all()
+    # for item in text.iterator():
+    #     style = Style.objects.filter(name=item.role)[0]
+    #     data = StyleSerializer(style).data
+    #     styles.append(data)
+
     if request.method == 'GET':
         serializer_post = PostSerializer(post)
-        serializer_appendist = AppendixSerializer(appendist, many=True)
-        serializer_text = TextSerializer(text, many=True)
-        serializer_citation = CitationSerializer(citation, many=True)
+        t = []
+        a = []
+        c = []
+
+        # if len(texts)  > 0:
+        #     t = Text.objects.filter(id__in=texts[0])
+        # if len(appendists) > 0:
+        #     a = Appendix.objects.filter(id__in=appendists[0])
+        # if len(citations) > 0:
+        #     c = Citation.objects.filter(id__in=citations[0])
+        if (len(text) > 0):
+            for item in texts[0]:
+                t.append(Text.objects.get(id=item))
+        if (len(appendists) > 0):
+            for item in appendists[0]:
+                a.append(Appendix.objects.get(id=item))
+        if (len(citations) > 0):
+            for item in citations[0]:
+                c.append(Citation.objects.get(id=item))
+
+        # print("appendixes")
+        # print(a)
+        tags = Tag.objects.all()
+        # print(tags)
+        serializer_appendist = AppendixSerializer(a, many=True)
+        serializer_text = TextSerializer(t, many=True)
+        serializer_citation = CitationSerializer(c, many=True)
         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
                 'text': serializer_text.data, 'citation': serializer_citation.data,
-                'styles': styles}
+                'styles': StyleSerializer(styles, many=True).data,
+                'tags': TagSerializer(tags, many=True).data}
+
+        # print("to the end")
+        # print(data)
         return JsonResponse(data)
 
 
@@ -201,7 +733,7 @@ def post_detail_id(request):
     # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
     #     post.total_visited + 1, post.id])
     try:
-        text = Text.objects.filter(post=post)
+        text = Text.objects.filter(post=post).order_by('-date_created')
         appendist = Appendix.objects.filter(post=post)
         citation = Citation.objects.filter(post=post)
         styles = []
