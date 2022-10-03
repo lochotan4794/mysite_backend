@@ -40,8 +40,8 @@ def login_user(request):
         if username is not None:
             user = auth.authenticate(username=username, password=password)
         if email is not None:
-            name = User.objects.get(email=email)
-            user = auth.authenticate(username=name, password=password)
+            user = User.objects.get(email=email)
+            user = auth.authenticate(username=user.name, password=password)
         if user is not None:
             auth.login(request, user)
             uid = User.objects.get(username=user.username)

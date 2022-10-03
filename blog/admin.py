@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Post, Text, Citation, Appendix, Comment, Tag, Relationship
+from .models import Post, Text, Citation, Appendix, Comment, Tag, Relationship, Style
 
 
 class TextInline(admin.TabularInline):
@@ -27,6 +27,9 @@ class AppendixInline(admin.TabularInline):
 class RelationshipInline(admin.TabularInline):
     model = Relationship
     extra = 1
+
+class RelationshipAdmin(admin.ModelAdmin):
+   list_display = ('post', 'tag')
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -66,9 +69,17 @@ class TagAdmin(admin.ModelAdmin):
     exclude = ('members',)
 
 
+class StyleAdmin(admin.ModelAdmin):
+    model= Style
+    list_display = ('name', 'indentLevel', 'fontSize', 'decor',)
+
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Text)
 admin.site.register(Citation)
 admin.site.register(Appendix)
+admin.site.register(Style, StyleAdmin)
+admin.site.register(Relationship, RelationshipAdmin)
+
+

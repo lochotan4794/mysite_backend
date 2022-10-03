@@ -26,5 +26,18 @@ urlpatterns = [
          views.post_list_relative, name='post_relative'),
     path('search', view=views.post_list_for_key,
          name='list_post_for_key'),
-    path('upload/image/', views.image_upload_view, name='upload')
+    path('upload/image/', views.image_upload_view, name='upload'),
+    path('admin/update/', views.admin_update, name='update'),
+    path('admin/delete/', views.admin_delete, name='delete'),
+    path('admin/add/', views.admin_add, name='add'),
+    path('admin/insert/', views.admin_insert, name='insert'),
+    path('admin/side/', views.admin_side, name='side'),
+    path('admin/dummy/', views.admin_dummy, name='side'),
+    path('admin/removetag/', views.admin_removetag, name='side'),
+    path('admin/taglist/', views.admin_taglist, name='side'),
+    path('admin/deletepost/', views.admin_delete_post, name="deletepost"),
+    path('admin/searchpost/', views.admin_search_post, name="searchpost"),
+    path('admin/setnext/', views.admin_setnext, name="setnext"),
+    path('admin/setprevious/', views.admin_setprevious, name="setprevious")
 ]
+ 
