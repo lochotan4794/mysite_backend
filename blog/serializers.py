@@ -41,7 +41,7 @@ class RelationshipSerializer(serializers.ModelSerializer):
 class RelatedPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('slug')
+        fields = ('slug', 'title')
 
 
 class PostSerializer(serializers.ModelSerializer):

@@ -36,7 +36,9 @@ TEXT_FUNCTIONAL = (
     (6, "h1"),
     (7, "h2"),
     (8, "h3"),
-    (9, "h4")
+    (9, "h4"),
+    (10, "code"),
+    (11, 'ol'),
 )
 
 COMPONENT = (
@@ -106,7 +108,7 @@ class Text(models.Model):
     link = models.CharField(max_length=100, blank=True)
     role = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
     image = models.ImageField(upload_to='images', blank=True)
-    cssId = models.IntegerField(default=0)
+    cssId = models.CharField(max_length=100, blank=True)
     # index = models.ForeignKey(
     #     Index,
     #     on_delete=models.CASCADE,
