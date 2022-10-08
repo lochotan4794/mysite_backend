@@ -210,9 +210,9 @@ if 'RDS_DB_NAME' in os.environ:
             'NAME': os.environ['DEV_DB_NAME'],
             'USER': 'postgres',
             # 'PASSWORD': 'Password4794',
-            'PASSWORD': 'postgres',
+            'PASSWORD': os.environ['RDS_PASSWORD'],
             # 'HOST': 'localhost',
-            'HOST': 'awseb-e-ttj3emmps3-stack-awsebrdsdatabase-xg2mjvb7raw3.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'HOST': 'awseb-e-2rd5cgb3mt-stack-awsebrdsdatabase-mvb10m7e45o6.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
         }
     }
