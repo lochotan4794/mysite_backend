@@ -179,54 +179,54 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     },
 # }
 
-if 'RDS_HOSTNAME' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOSTNAME'],
-            'PORT': os.environ['RDS_PORT'],
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': 'Password4794',
-            'HOST': 'localhost',
-            'PORT': '5433',
-        }
-    }
-
-# if 'RDS_DB_NAME' in os.environ:
+# if 'RDS_HOSTNAME' in os.environ:
 #     DATABASES = {
 #         'default': {
 #             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             # 'NAME': 'postgres',
-#             'NAME': os.environ['DEV_DB_NAME'],
-#             'USER': 'postgres',
-#             # 'PASSWORD': 'Password4794',
+#             'NAME': os.environ['RDS_DB_NAME'],
+#             'USER': os.environ['RDS_USERNAME'],
 #             'PASSWORD': os.environ['RDS_PASSWORD'],
-#             # 'HOST': 'localhost',
-#             'HOST': 'awseb-e-ttj3emmps3-stack-awsebrdsdatabase-xg2mjvb7raw3.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
-#             'PORT': '5432',
+#             'HOST': os.environ['RDS_HOSTNAME'],
+#             'PORT': os.environ['RDS_PORT'],
 #         }
 #     }
 # else:
 #     DATABASES = {
 #         'default': {
 #             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             'NAME': 'NEW1',
+#             'NAME': 'postgres',
 #             'USER': 'postgres',
 #             'PASSWORD': 'Password4794',
 #             'HOST': 'localhost',
-#             'PORT': '5432',
+#             'PORT': '5433',
 #         }
 #     }
+
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            # 'NAME': 'postgres',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            # 'PASSWORD': 'Password4794',
+            'PASSWORD': 'postgres',
+            # 'HOST': 'localhost',
+            'HOST': 'awseb-e-2rd5cgb3mt-stack-awsebrdsdatabase-mvb10m7e45o6.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'PORT': '5432',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'NEW1',
+            'USER': 'postgres',
+            'PASSWORD': 'Password4794',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
