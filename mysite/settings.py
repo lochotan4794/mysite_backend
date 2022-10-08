@@ -111,10 +111,11 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://master.d8vadauh948tl.amplifyapp.com',
+    'https://www.machinelearningpractices.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com']
+    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com', 'https://www.machinelearningpractices.com']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
