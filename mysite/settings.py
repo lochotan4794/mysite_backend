@@ -210,7 +210,7 @@ if 'RDS_DB_NAME' in os.environ:
             'NAME': 'postgres',
             'USER': 'postgres',
             # 'PASSWORD': 'Password4794',
-            'PASSWORD': 'postgres',
+            'PASSWORD': 'Password4794',
             # 'HOST': 'localhost',
             'HOST': 'awseb-e-2rd5cgb3mt-stack-awsebrdsdatabase-mvb10m7e45o6.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
