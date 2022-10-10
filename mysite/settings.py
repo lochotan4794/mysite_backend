@@ -111,10 +111,11 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://master.d8vadauh948tl.amplifyapp.com',
+    'https://www.machinelearningpractices.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com']
+    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com', 'https://www.machinelearningpractices.com']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -178,7 +179,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     },
 # }
 
-# if 'RDS_DB_NAME' in os.environ:
+# if 'RDS_HOSTNAME' in os.environ:
 #     DATABASES = {
 #         'default': {
 #             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -206,12 +207,12 @@ if 'RDS_DB_NAME' in os.environ:
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             # 'NAME': 'postgres',
-            'NAME': os.environ['DEV_DB_NAME'],
+            'NAME': 'postgres',
             'USER': 'postgres',
             # 'PASSWORD': 'Password4794',
-            'PASSWORD': 'postgres',
+            'PASSWORD': 'Password4794',
             # 'HOST': 'localhost',
-            'HOST': 'awseb-e-ttj3emmps3-stack-awsebrdsdatabase-xg2mjvb7raw3.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'HOST': 'awseb-e-2rd5cgb3mt-stack-awsebrdsdatabase-mvb10m7e45o6.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
         }
     }
