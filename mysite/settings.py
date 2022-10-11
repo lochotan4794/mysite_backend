@@ -118,7 +118,7 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
     STATIC_ROOT = os.path.join (BASE_DIR, 'static')
 
     STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
-    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION
+    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
 
 
 CORS_ALLOWED_ORIGINS = [
