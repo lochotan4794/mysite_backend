@@ -50,6 +50,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # users will be redirected to the home page after login
 LOGIN_REDIRECT_URL = 'home'
 
+
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -107,6 +109,8 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
 
     AWS_S3_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
     AWS_S3_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
