@@ -50,7 +50,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # users will be redirected to the home page after login
 LOGIN_REDIRECT_URL = 'home'
 
-
+CORS_ORIGIN_ALLOW_ALL = True
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
