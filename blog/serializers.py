@@ -9,6 +9,7 @@ class StyleSerializer(serializers.ModelSerializer):
 
 class TextSerializer(serializers.ModelSerializer):
     # style = StyleSerializer()
+    image = serializers.ImageField(max_length=None, use_url=True, allow_null=True, required=False)
     class Meta:
         model = Text
         fields = ( 'link', 'content',
