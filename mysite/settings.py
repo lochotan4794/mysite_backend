@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-f$tx09suq-(baomq^l%-u6^zmtw&#ts-983dg(tu-vs_-!piuy
 DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64',
+ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'machinelearningpractices.com',
                  'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*']
 
 
