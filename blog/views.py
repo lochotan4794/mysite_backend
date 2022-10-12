@@ -131,8 +131,9 @@ def post_list_relative(request, slug):
         #     posts = Post.objects.raw('SELECT * FROM blog_post WHERE id = %s',
         #                              r.post_id) | posts
 
-        posts = Post.objects.raw('SELECT p.id, p.title, p.slug FROM blog_post p, blog_relationship r, blog_tag t WHERE p.id = r.post_id AND r.tag_id=%s ORDER BY p.total_visited DESC',
-                                 relationships.values_list('tag_id', flat=True))
+        posts = Post.objects.raw('SELECT  p.id, p.title, p.slug FROM blog_post p, blog_relationship r WHERE p.id = r.post_id AND r.tag_id=%s ORDER BY p.total_visited DESC',
+                                 relationships.values_list('tag', flat=True))
+
         # if len(tags) == 0 or tags is None:
         #     return JsonResponse([])
 
@@ -148,10 +149,9 @@ def post_list_relative(request, slug):
         #         relative = Post.objects.filter(pk=r.values_list("post_id"))
         #         posts = posts | relative
         # # print(tags[0])
-        if len(posts) > 4:
-            selected = posts[:5]
-        else:
-            selected = posts
+        selected = posts
+        if len(list(selected)) > 5:
+            selected = selected[:5]
         serializer_post = PostSerializer(selected, many=True)
         return JsonResponse(serializer_post.data, safe=False)
         # return JsonResponse([], safe=False)

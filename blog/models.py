@@ -179,7 +179,7 @@ class Relationship(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name='relationship')
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE,
-                            related_name='relationship')
+                            related_name='tag')
 
     @classmethod
     def create(cls, tag, post):
