@@ -76,7 +76,7 @@ class PostList(ListCreateAPIView):
 @ csrf_exempt
 def post_list_relevent(request):
     if request.method == 'GET':
-        posts = Post.objects.order_by('-total_visited')[:5]
+        posts = Post.objects.exclude(title="Dummy").order_by('-total_visited')[:5]
         serializer_post = PostSerializer(posts, many=True)
         return JsonResponse(serializer_post.data, safe=False)
 
@@ -84,7 +84,7 @@ def post_list_relevent(request):
 @ csrf_exempt
 def post_list_recent(request):
     if request.method == 'GET':
-        posts = Post.objects.order_by('-created_on')[:5]
+        posts = Post.objects.exclude(title="Dummy").order_by('-created_on')[:5]
         serializer_post = PostSerializer(posts, many=True)
         return JsonResponse(serializer_post.data, safe=False)
 
@@ -154,7 +154,7 @@ def post_list_relative(request, slug):
 @ csrf_exempt
 def post_list(request):
     if request.method == 'POST':
-        posts = Post.objects.all().filter(~Q(title="Dummy"))
+        posts = Post.objects.all().exclude(title="Dummy")
         tags = Tag.objects.all()
         # tags = []
         # for pos in posts:
@@ -225,10 +225,10 @@ def admin_setnext(request):
 @ csrf_exempt
 def admin_setprevious(request):
     slug = request.POST['slug']
-    next_slug = request.POST['preSlug']
+    pre_slug = request.POST['preSlug']
     post = get_object_or_404(Post, slug=slug)
-    next = get_object_or_404(Post, slug=next_slug)
-    post.previous_post = next
+    pre = get_object_or_404(Post, slug=pre_slug)
+    post.previous_post = pre
     post.save()
     json_response = {"result": "ok"}
     return JsonResponse(json_response, safe=False)

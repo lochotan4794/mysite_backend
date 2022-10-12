@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 # from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -72,8 +73,8 @@ class Post(models.Model):
     lang = models.IntegerField(choices=LANG, default=0)
     video = models.CharField(max_length=200, blank=True)
     pdf = models.FileField(upload_to='pdf', blank=True)
-    previous_post=models.OneToOneField('self', null=True, blank=True, related_name='previous', on_delete=models.CASCADE)
-    next_post=models.OneToOneField('self', null=True, blank=True, related_name='next', on_delete=models.CASCADE)
+    previous_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='previous', on_delete=models.CASCADE)
+    next_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='next', on_delete=models.CASCADE)
     
 
     class Meta:
