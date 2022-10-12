@@ -77,21 +77,21 @@ class PostList(ListCreateAPIView):
 def post_list_relevent(request):
     if request.method == 'GET':
         posts = Post.objects.exclude(title="Dummy").order_by('-total_visited')
-        if posts.count() < 5:
+        if posts.count < 5:
             serializer_post = PostSerializer(posts, many=True)
         else:
-            serializer_post = PostSerializer(posts[:5], many=True)
+            serializer_post = PostSerializer(posts, many=True)[:5]
         return JsonResponse(serializer_post.data, safe=False)
 
 
 @ csrf_exempt
 def post_list_recent(request):
     if request.method == 'GET':
-        posts = Post.objects.exclude(title="Dummy").order_by('-total_visited')
-        if posts.count() < 5:
+        posts = Post.objects.exclude(title="Dummy").order_by('-created_on')
+        if posts.count < 5:
             serializer_post = PostSerializer(posts, many=True)
         else:
-            serializer_post = PostSerializer(posts[:5], many=True)
+            serializer_post = PostSerializer(posts, many=True)[:5]
         return JsonResponse(serializer_post.data, safe=False)
 
 
@@ -217,7 +217,6 @@ def admin_removetag(request):
             tag_list.append(Tag.objects.get(title=r.tag.title).title)
     return JsonResponse(tag_list, safe=False)
 
-
 @ csrf_exempt
 def admin_setnext(request):
     slug = request.POST['slug']
@@ -229,7 +228,6 @@ def admin_setnext(request):
     json_response = {"result": "ok"}
     return JsonResponse(json_response, safe=False)
 
-
 @ csrf_exempt
 def admin_setprevious(request):
     slug = request.POST['slug']
@@ -240,7 +238,6 @@ def admin_setprevious(request):
     post.save()
     json_response = {"result": "ok"}
     return JsonResponse(json_response, safe=False)
-
 
 @ csrf_exempt
 def admin_taglist(request):
