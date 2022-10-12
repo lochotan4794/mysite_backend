@@ -77,7 +77,7 @@ class PostList(ListCreateAPIView):
 def post_list_relevent(request):
     if request.method == 'GET':
         posts = Post.objects.exclude(title="Dummy").order_by('-total_visited')
-        if posts.count < 5:
+        if posts.count() < 5:
             serializer_post = PostSerializer(posts, many=True)
         else:
             serializer_post = PostSerializer(posts, many=True)[:5]
@@ -88,7 +88,7 @@ def post_list_relevent(request):
 def post_list_recent(request):
     if request.method == 'GET':
         posts = Post.objects.exclude(title="Dummy").order_by('-created_on')
-        if posts.count < 5:
+        if posts.count() < 5:
             serializer_post = PostSerializer(posts, many=True)
         else:
             serializer_post = PostSerializer(posts, many=True)[:5]
