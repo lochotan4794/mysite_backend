@@ -49,7 +49,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # users will be redirected to the home page after login
 LOGIN_REDIRECT_URL = 'home'
-SECURE_SSL_REDIRECT=False
 
 
 SIMPLE_JWT = {
