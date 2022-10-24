@@ -51,7 +51,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 LOGIN_REDIRECT_URL = 'home'
 
 
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -114,10 +113,11 @@ if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
     STATICFILES_LOCATION = 'static'
     MEDIAFILES_LOCATION = 'media'
 
-    MEDIA_ROOT = os.path.join (BASE_DIR, 'static/images/')
-    STATIC_ROOT = os.path.join (BASE_DIR, 'static')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images/')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN,
+                                     STATICFILES_LOCATION)
     MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
 
 
@@ -234,6 +234,14 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'NEW1',
+            'USER': 'postgres',
+            'PASSWORD': 'Password4794',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        },
+        'users': {
+            'NAME': 'users',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'USER': 'postgres',
             'PASSWORD': 'Password4794',
             'HOST': 'localhost',

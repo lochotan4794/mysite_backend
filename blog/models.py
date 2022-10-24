@@ -1,4 +1,5 @@
 from enum import unique
+from pydoc_data.topics import topics
 from django.db import models
 # from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -40,12 +41,22 @@ TEXT_FUNCTIONAL = (
     (9, "h4"),
     (10, "code"),
     (11, 'ol'),
+    (12, 'video')
 )
 
 COMPONENT = (
     (0, "Appendix"),
     (1, "Text"),
     (2, "Citation"),
+)
+
+TOPIC = (
+    (0, "CV"),
+    (1, "SPEECH"),
+    (2, "NLP"),
+    (3, "OTHERS"),
+    (4, "ML"),
+    (5, "EMBED")
 )
 
 function_to_index = {
@@ -67,6 +78,7 @@ class Post(models.Model):
     # content = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
+    topic = models.IntegerField(choices=TOPIC, default=0, blank=True)
     total_visited = models.IntegerField(default=0)
     eng_ver = models.ForeignKey(
         'Post', on_delete=models.CASCADE, null=True, blank=True)
@@ -76,7 +88,6 @@ class Post(models.Model):
     previous_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='previous', on_delete=models.CASCADE)
     next_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='next', on_delete=models.CASCADE)
     
-
     class Meta:
         ordering = ['-created_on']
 

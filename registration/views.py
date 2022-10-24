@@ -22,11 +22,12 @@ from django.shortcuts import get_object_or_404
 def edit_profile(request):
     if request.method == "POST":
         email = request.POST['email']
-        user = get_object_or_404(User, email=email)
+        #user = get_object_or_404(User, email=email)
+        user = User.objects.using("users").get(email=email)
         user.email = email
         for key in request.POST.keys():
             setattr(user, key,  request.POST[key])
-        user.save()
+        user.save(using="users")
         data = UserSerializer(user).data
         return JsonResponse(data, safe=False)
 
@@ -40,11 +41,11 @@ def login_user(request):
         if username is not None:
             user = auth.authenticate(username=username, password=password)
         if email is not None:
-            user = User.objects.get(email=email)
+            user = User.objects.objects.using("users").get(email=email)
             user = auth.authenticate(username=user.name, password=password)
         if user is not None:
             auth.login(request, user)
-            uid = User.objects.get(username=user.username)
+            uid = User.objects.using("users").get(username=user.username)
             data = UserSerializer(uid).data
             return JsonResponse(data, safe=False)
         else:
@@ -67,7 +68,7 @@ def verify_email(request):
             # save form in the memory not in database
             user = form.save(commit=False)
             user.is_active = False
-            user.save()
+            user.save(using='users')
             # to get the domain of the current site
             current_site = get_current_site(request)
             mail_subject = 'Activation link has been sent to your email id'
@@ -95,7 +96,7 @@ def signup(request):
             # save form in the memory not in database
             user = form.save(commit=False)
             user.is_active = False
-            user.save()
+            user.save(using="users")
             # to get the domain of the current site
             current_site = get_current_site(request)
             mail_subject = 'Activation link has been sent to your email id'
@@ -125,7 +126,7 @@ def activate(request, uidb64, token):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
-        user.save()
+        user.save(using="users")
         return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
@@ -136,7 +137,7 @@ def register_user(request):
     if request.method == 'POST':
         serializer = RegisterSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        user = serializer.save(using="users")
         refresh = RefreshToken.for_user(user)
         res = {
             "refresh": str(refresh),
