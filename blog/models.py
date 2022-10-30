@@ -1,5 +1,4 @@
 from enum import unique
-from pydoc_data.topics import topics
 from django.db import models
 # from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -41,7 +40,8 @@ TEXT_FUNCTIONAL = (
     (9, "h4"),
     (10, "code"),
     (11, 'ol'),
-    (12, 'video')
+    (12, 'video'),
+    (13, 'html')
 )
 
 COMPONENT = (
@@ -51,12 +51,14 @@ COMPONENT = (
 )
 
 TOPIC = (
-    (0, "CV"),
-    (1, "SPEECH"),
-    (2, "NLP"),
-    (3, "OTHERS"),
-    (4, "ML"),
-    (5, "EMBED")
+    (0, "NLP"),
+    (1, "ML"),
+    (2, "SPEECH"),
+    (3, "CV"),
+    (4, "EMBED"),
+    (5, "OHTER"),
+    (6, "CAR"),
+    (7, "NET")
 )
 
 function_to_index = {
@@ -72,13 +74,12 @@ class Post(models.Model):
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
     thumnail = models.ImageField(upload_to='images', blank=True)
-    abstract = models.CharField(max_length=200, unique=True, blank=True)
+    abstract = models.CharField(max_length=1000, unique=True, blank=True)
     # author = models.ForeignKey(User, on_delete= models.CASCADE,related_name='blog_posts')
     updated_on = models.DateTimeField(auto_now=True)
     # content = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
-    topic = models.IntegerField(choices=TOPIC, default=0, blank=True)
     total_visited = models.IntegerField(default=0)
     eng_ver = models.ForeignKey(
         'Post', on_delete=models.CASCADE, null=True, blank=True)
@@ -87,7 +88,9 @@ class Post(models.Model):
     pdf = models.FileField(upload_to='pdf', blank=True)
     previous_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='previous', on_delete=models.CASCADE)
     next_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='next', on_delete=models.CASCADE)
+    topic = models.IntegerField(choices=TOPIC, default=0, blank=True)
     
+
     class Meta:
         ordering = ['-created_on']
 
@@ -246,7 +249,7 @@ class Appendix(models.Model):
 
 class Citation(models.Model):
     previous=models.OneToOneField('self', null=True, blank=True, related_name='next', on_delete=models.CASCADE)
-    text = models.CharField(max_length=200, default="")
+    text = models.CharField(max_length=1000, default="")
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
