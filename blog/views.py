@@ -449,10 +449,12 @@ def admin_side(request):
             post.thumnail = request.FILES['thumnail']
         if 'tag' in request.POST:
             tag_data = request.POST['tag']
-        if 'pdf' in request.POST:
-            post.pdf = request.POST['pdf']
+        if 'pdf' in request.FILES:
+            post.pdf = request.FILES['pdf']
         if 'video' in request.POST:
             post.video = request.POST['video']
+        print(request.FILES)
+        print(request.POST)
         tags = json.loads(tag_data)
         for t in tags["data"]:
             # print(t)
@@ -793,8 +795,8 @@ def delete_comment(request, slug):
     post = get_object_or_404(Post, slug=slug)
     try:
         id = request.POST['id']
-        Comment.objects.using("users").filter(id=id).delete()
-        comment = Comment.objects.using("users").filter(post=post)
+        Comment.objects.filter(id=id).delete()
+        comment = Comment.objects.filter(post=post)
     except Post.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -803,10 +805,9 @@ def delete_comment(request, slug):
         return JsonResponse(commentSerializer.data, safe=False)
 
 
-@ csrf_exempt    
+@ csrf_exempt
 def create_comment(request, slug):
-    # post = get_object_or_404(Post, slug=slug)
-    post = Post.objects.using("default").get(slug=slug)
+    post = get_object_or_404(Post, slug=slug)
     try:
         text = request.POST['text']
         reply_to = request.POST['reply_to']
@@ -814,16 +815,13 @@ def create_comment(request, slug):
         if reply_to == 'null':
             reply_to = None
         else:
-            try:
-                reply_to = Comment.objects.using("users").get(pk=int(reply_to))
-            except Comment.DoesNotExist:
-                reply_to = None
-        user = User.objects.using("default").get(email__exact=email)
-        post = Post.objects.using("default").get(slug=slug)
+            reply_to = Comment.objects.get(pk=int(reply_to))
+        user = User.objects.get(email__exact=email)
+        post = Post.objects.get(slug=slug)
         newcomment = Comment(body=text, reply_to=reply_to,
                              user=user, email=email, post=post, name=user.username)
-        newcomment.save(using="users")
-        n = Comment.objects.using("users").filter(pk=newcomment.id)
+        newcomment.save()
+        n = Comment.objects.filter(pk=newcomment.id)
         if request.method == 'POST':
             commentSerializer = CommentSerializer(n, many=True)
             return JsonResponse(commentSerializer.data, safe=False)
@@ -838,11 +836,11 @@ def update_comment(request, slug):
     try:
         id = request.POST['id']
         text = request.POST['text']
-        update = Comment.objects.using("users").filter(id=id)
+        update = Comment.objects.filter(id=id)
         update.body = text
-        update.save(using="users")
+        update.save()
         # comment = Comment.objects.filter(post=post)
-        comment = Comment.objects.using("users").filter(pk=update.id)
+        comment = Comment.objects.filter(pk=update.id)
     except Post.DoesNotExist:
         return HttpResponse(status=404)
 
