@@ -54,7 +54,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('title', 'slug', 'updated_on', 'created_on',
-                  'status', 'thumnail', 'abstract', 'total_visited', 'eng_ver', 'lang', 'relationship', 'video', 'pdf', 'previous_post', 'next_post')
+                  'status', 'thumnail', 'abstract', 'total_visited', 'eng_ver', 'lang', 'relationship', 'video', 'pdf', 'previous_post', 'next_post', 'topic')
 
         # def get_related_field(self, model_field):
         #     return PostSerializer()
