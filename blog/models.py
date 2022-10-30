@@ -43,7 +43,7 @@ TEXT_FUNCTIONAL = (
     (12, 'video'),
     (13, 'html')
 )
-
+# comment 
 COMPONENT = (
     (0, "Appendix"),
     (1, "Text"),
