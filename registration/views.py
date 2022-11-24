@@ -1,5 +1,3 @@
-from dataclasses import field
-import email
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from .forms import SignupForm
@@ -15,19 +13,20 @@ from .serializers import RegisterSerializer, UserSerializer, EditUserSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User, auth
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 
 
 @csrf_exempt
 def edit_profile(request):
     if request.method == "POST":
         email = request.POST['email']
+        # print(email)
         #user = get_object_or_404(User, email=email)
-        user = User.objects.using("users").get(email=email)
+        user = User.objects.get(email=email)
         user.email = email
         for key in request.POST.keys():
-            setattr(user, key,  request.POST[key])
-        user.save(using="users")
+            if request.POST[key] != "undefined":
+                setattr(user, key,  request.POST[key])
+        user.save()
         data = UserSerializer(user).data
         return JsonResponse(data, safe=False)
 
@@ -41,11 +40,11 @@ def login_user(request):
         if username is not None:
             user = auth.authenticate(username=username, password=password)
         if email is not None:
-            user = User.objects.objects.using("users").get(email=email)
+            user = User.objects.objects.get(email=email)
             user = auth.authenticate(username=user.name, password=password)
         if user is not None:
             auth.login(request, user)
-            uid = User.objects.using("users").get(username=user.username)
+            uid = User.objects.get(username=user.username)
             data = UserSerializer(uid).data
             return JsonResponse(data, safe=False)
         else:

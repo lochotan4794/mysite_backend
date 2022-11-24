@@ -12,7 +12,33 @@ from django.http import HttpResponse, JsonResponse
 from .serializers import UserProfileSerializer, UserSerializer
 
 # Create your views here.
-
+@csrf_exempt
+def edit_profile(request):
+    if request.method == "POST":
+        email = request.POST['email']
+        # print(email)
+        #user = get_object_or_404(User, email=email)
+        user = User.objects.get(email=email)
+        try:
+            profile = UserProfile.objects.get(user_name=user)
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.create(user_name=user, phone=None, avatar=None, accept=False)
+        user.email = email
+        for key in request.POST.keys():
+            if key == "phone_number" or key == "avatar":
+                setattr(profile, key,  request.POST[key])
+            if key == "accept_email":
+                if  request.POST[key] == "true":
+                    setattr(profile, key,  True)
+                else:
+                    setattr(profile, key,  False)
+            else:
+                if request.POST[key] != "undefined":
+                    setattr(user, key,  request.POST[key])
+        user.save()
+        profile.save()
+        data = UserSerializer(user).data
+        return JsonResponse(data, safe=False)
 
 def home(request):
     return render(request, "users/home.html")
