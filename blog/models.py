@@ -41,7 +41,10 @@ TEXT_FUNCTIONAL = (
     (10, "code"),
     (11, 'ol'),
     (12, 'video'),
-    (13, 'html')
+    (13, 'html'),
+    (14, 'html_styled'),
+    (15, 'math'),
+    (16, 'table')
 )
 # comment 
 COMPONENT = (
@@ -58,7 +61,8 @@ TOPIC = (
     (4, "EMBED"),
     (5, "OHTER"),
     (6, "CAR"),
-    (7, "NET")
+    (7, "NET"),
+    (8, "STORY")
 )
 
 function_to_index = {
@@ -213,6 +217,7 @@ class Style(models.Model):
     indentLevel = models.IntegerField(default=0)
     fontSize = models.IntegerField(default=24)
     decor = models.IntegerField(choices=TEXT_DECORATION, default=0)
+    fontWeight = models.IntegerField(default=100)
 
     def __str__(self):
         return str(self.name)

@@ -453,8 +453,10 @@ def admin_side(request):
             post.pdf = request.FILES['pdf']
         if 'video' in request.POST:
             post.video = request.POST['video']
-        print(request.FILES)
-        print(request.POST)
+        if 'topic' in request.POST:
+            post.topic = request.POST['topic']
+        # print(request.FILES)
+        # print(request.POST)
         tags = json.loads(tag_data)
         for t in tags["data"]:
             # print(t)
@@ -724,6 +726,18 @@ def post_detail(request, slug):
         # print(data)
         return JsonResponse(data)
 
+@ csrf_exempt
+@api_view(['GET', 'POST'])
+def get_stories(request):
+    # print("call api")
+    topic_id = request.POST.get('topic_id')
+    try: 
+        posts = Post.objects.filter(topic=topic_id)
+        serializer_post = PostSerializer(posts, many=True)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+    return  JsonResponse(serializer_post.data, safe=False)
+
 
 @ csrf_exempt
 @api_view(['GET', 'POST'])
@@ -763,8 +777,6 @@ def post_detail_id(request):
 
 
 csrf_exempt
-
-
 def search_default(request):
     if request.method == 'GET':
         return JsonResponse({"data": "data"})

@@ -71,7 +71,7 @@ class TagAdmin(admin.ModelAdmin):
 
 class StyleAdmin(admin.ModelAdmin):
     model= Style
-    list_display = ('name', 'indentLevel', 'fontSize', 'decor',)
+    list_display = ('name', 'indentLevel', 'fontSize', 'decor', 'fontWeight',)
 
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Tag, TagAdmin)

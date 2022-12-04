@@ -5,7 +5,7 @@ from blog.models import Post, Relationship, Text, Appendix, Citation, Comment, T
 class StyleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Style
-        fields = ('name', 'indentLevel', 'fontSize', 'decor')
+        fields = ('name', 'indentLevel', 'fontSize', 'decor', 'fontWeight')
 
 class TextSerializer(serializers.ModelSerializer):
     # style = StyleSerializer()
