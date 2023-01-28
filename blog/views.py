@@ -77,10 +77,10 @@ class PostList(ListCreateAPIView):
 def post_list_relevent(request):
     if request.method == 'GET':
         posts = Post.objects.exclude(title="Dummy").order_by('-total_visited')
-        if posts.count() < 5:
+        if posts.count() < 10:
             serializer_post = PostSerializer(posts, many=True)
         else:
-            serializer_post = PostSerializer(posts, many=True)[:5]
+            serializer_post = PostSerializer(posts[0:9], many=True)
         return JsonResponse(serializer_post.data, safe=False)
 
 
@@ -88,10 +88,10 @@ def post_list_relevent(request):
 def post_list_recent(request):
     if request.method == 'GET':
         posts = Post.objects.exclude(title="Dummy").order_by('-created_on')
-        if posts.count() < 5:
+        if posts.count() < 10:
             serializer_post = PostSerializer(posts, many=True)
         else:
-            serializer_post = PostSerializer(posts, many=True)[:5]
+            serializer_post = PostSerializer(posts[0:9], many=True)
         return JsonResponse(serializer_post.data, safe=False)
 
 
@@ -345,17 +345,25 @@ def admin_delete(request):
             next = Text.objects.get(previous=id)
         except Text.DoesNotExist:
             next = None
-        if curr is not None and next is not None:
+        if next is not None:
             if curr.previous is None:
                 next.previous = None
-                next.save()
                 curr.delete()
-            if curr.previous is not None and next is not None:
+                next.save()
+            else:
                 next.previous = curr.previous
+                nodes = []
+                nodes.append(next)
+                # Because delete cascade so need to store, if not all next node be deleted
+                while(hasattr(next, 'next')):
+                    nodes.append(next.next)
+                    next = next.next
                 curr.delete()
-                next.save()
-        if next is None and curr is not None:
-            curr.delete()
+                for node in nodes:
+                    node.save()
+        else: 
+            if curr is not None:
+                curr.delete()
     if (type == "citation"):
         try:
             curr = Citation.objects.get(id=id)
@@ -365,20 +373,25 @@ def admin_delete(request):
             next = Citation.objects.get(previous=id)
         except Citation.DoesNotExist:
             next = None
-        if curr is not None and next is not None:
+        if next is not None:
             if curr.previous is None:
                 next.previous = None
-                next.save()
                 curr.delete()
-                print("delete1")
-            if curr.previous is not None and next is not None:
+                next.save()
+            else:
                 next.previous = curr.previous
+                nodes = []
+                nodes.append(next)
+                # Because delete cascade so need to store, if not all next node be deleted
+                while(hasattr(next, 'next')):
+                    nodes.append(next.next)
+                    next = next.next
                 curr.delete()
-                next.save()
-                print("delete2")
-        if next is None and curr is not None:
-            curr.delete()
-            print("delete3")
+                for node in nodes:
+                    node.save()
+        else: 
+            if curr is not None:
+                curr.delete()
     if (type == "appendix"):
         try:
             curr = Appendix.objects.get(id=id)
@@ -388,17 +401,25 @@ def admin_delete(request):
             next = Appendix.objects.get(previous=id)
         except Appendix.DoesNotExist:
             next = None
-        if curr is not None and next is not None:
+        if next is not None:
             if curr.previous is None:
                 next.previous = None
-                next.save()
                 curr.delete()
-            if curr.previous is not None and next is not None:
+                next.save()
+            else:
                 next.previous = curr.previous
+                nodes = []
+                nodes.append(next)
+                # Because delete cascade so need to store, if not all next node be deleted
+                while(hasattr(next, 'next')):
+                    nodes.append(next.next)
+                    next = next.next
                 curr.delete()
-                next.save()
-        if next is None and curr is not None:
-            curr.delete()
+                for node in nodes:
+                    node.save()
+        else: 
+            if curr is not None:
+                curr.delete()
 
     jsondata = {"result": "ok"}
     return JsonResponse(jsondata)
@@ -447,6 +468,8 @@ def admin_side(request):
             post.status = request.POST['status']
         if 'thumnail' in request.FILES:
             post.thumnail = request.FILES['thumnail']
+        if 'ava' in request.POST:
+            post.ava = request.POST['ava']
         if 'tag' in request.POST:
             tag_data = request.POST['tag']
         if 'pdf' in request.FILES:

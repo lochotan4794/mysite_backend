@@ -44,7 +44,8 @@ TEXT_FUNCTIONAL = (
     (13, 'html'),
     (14, 'html_styled'),
     (15, 'math'),
-    (16, 'table')
+    (16, 'table'),
+    (17, 'img_src')
 )
 # comment 
 COMPONENT = (
@@ -89,6 +90,7 @@ class Post(models.Model):
         'Post', on_delete=models.CASCADE, null=True, blank=True)
     lang = models.IntegerField(choices=LANG, default=0)
     video = models.CharField(max_length=200, blank=True)
+    ava = models.CharField(max_length=1000, blank=True)
     pdf = models.FileField(upload_to='pdf', blank=True)
     previous_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='previous', on_delete=models.CASCADE)
     next_post=models.ForeignKey('self', unique=False, null=True, blank=True, related_name='next', on_delete=models.CASCADE)
@@ -128,6 +130,7 @@ class Text(models.Model):
     role = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
     image = models.ImageField(upload_to='images', blank=True)
     cssId = models.CharField(max_length=100, blank=True)
+    # image_src = models.CharField(max_length=100, blank=True)
     # index = models.ForeignKey(
     #     Index,
     #     on_delete=models.CASCADE,
