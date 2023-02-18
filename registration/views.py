@@ -9,10 +9,82 @@ from .tokens import account_activation_token
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer, UserSerializer, EditUserSerializer
+from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User, auth
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
+from rest_framework.response import Response
+#https://iheanyi.com/journal/user-registration-authentication-with-django-django-rest-framework-react-and-redux/
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework import generics, permissions
+
+
+# class UserLogIn(ObtainAuthToken):
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.validated_data['user']
+#             token = Token.objects.get(user=user)
+#             return Response({
+#                 'token': token.key,
+#                 'id': user.pk,
+#                 'username': user.username
+#             })
+#         else:
+#             print(serializer.errors)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserLogIn(generics.GenericAPIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            # token = Token.objects.get(user=user)
+            return Response({
+                # 'token': token.key,
+                'id': user.pk,
+                'username': user.username
+            })
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class CustomAuthToken(ObtainAuthToken):
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data,
+#                                            context={'request': request})
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         token, created = Token.objects.get_or_create(user=user)
+#         return Response({
+#             'token': token.key,
+#             'user_id': user.pk,
+#             'email': user.email
+#         })
+
+class UserCreate(generics.GenericAPIView):
+    """ 
+    Creates the user. 
+    """
+
+    def post(self, request, format='json'):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                try:
+                    token = Token.objects.get(user_id=user.id)
+                except Token.DoesNotExist:
+                    token = Token.objects.create(user=user)
+                json = serializer.data
+                json['token'] = token.key
+                return Response(json, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -40,8 +112,8 @@ def login_user(request):
         if username is not None:
             user = auth.authenticate(username=username, password=password)
         if email is not None:
-            user = User.objects.objects.get(email=email)
-            user = auth.authenticate(username=user.name, password=password)
+            user = User.objects.get(email=email)
+            user = auth.authenticate(username=user.username, password=password)
         if user is not None:
             auth.login(request, user)
             uid = User.objects.get(username=user.username)

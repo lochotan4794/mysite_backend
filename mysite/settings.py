@@ -15,6 +15,8 @@ from datetime import timedelta
 import os
 
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -80,8 +82,17 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    ]
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework.authentication.BasicAuthentication',
+    #     'rest_framework.authentication.SessionAuthentication',
+    # ]
 }
+
+# AUTHENTICATION_BACKENDS = (
+#    "django.contrib.auth.backends.ModelBackend",
+#    "allauth.account.auth_backends.AuthenticationBackend"
+# )
 
 INSTALLED_APPS = [
     'polls.apps.PollsConfig',
@@ -94,6 +105,7 @@ INSTALLED_APPS = [
     'users',
     'registration',
     'rest_framework',
+    'rest_framework.authtoken',
     'blog',
     'corsheaders',
     'storages',
@@ -126,6 +138,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://master.d8vadauh948tl.amplifyapp.com',
     'https://www.machinelearningpractices.com',
 ]
+
+
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com', 'https://www.machinelearningpractices.com']
