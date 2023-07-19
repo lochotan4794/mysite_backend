@@ -4,14 +4,13 @@ from time import time
 from django.http import JsonResponse
 # Create your views here.
 from rest_framework.generics import ListCreateAPIView
-from blog.serializers import AppendixSerializer, CitationSerializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer
+from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, RelationshipSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
 from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag
 # from .forms import ImageForm
 import distance
-import numpy as np
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 import datetime
@@ -19,14 +18,14 @@ from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.db.models import CharField
 # from django.db.models.functions import Search
-
+import numpy as np
 # CharField.register_lookup(Search)
 
 
 def list_to_queryset(model, data):
     from django.db.models.base import ModelBase
 
-    if not isinstance(model, ModelBase):
+    if not isinstance(model, ModelBase): 
         raise ValueError(
             "%s must be Model" % model
         )
@@ -99,9 +98,6 @@ def post_list_recent(request):
 def post_list_tag(request, t):
     if request.method == 'GET':
         tag = get_object_or_404(Tag, title=t)
-        # print("Hah ha ha")
-        # print(tag)
-        # posts = Post.objects.filter(tag=tag)
         relationship = get_object_or_404(Relationship, tag=tag)
         posts = Post.objects.filter(pk=relationship.post.id)
         # print(posts)
@@ -117,6 +113,7 @@ def post_list_relative(request, slug):
     """
     Retrieve, update or delete a code snippet.
     """
+    print(slug)
     if request.method == 'GET' or request.method == 'POST':
         p = Post.objects.filter(slug=slug)[0]
         relationships = p.relationship.all()
@@ -151,7 +148,7 @@ def post_list_relative(request, slug):
         # # print(tags[0])
         selected = posts
         if len(list(selected)) > 5:
-            selected = selected[:5]
+            selected = selected[0:4]
         serializer_post = PostSerializer(selected, many=True)
         return JsonResponse(serializer_post.data, safe=False)
         # return JsonResponse([], safe=False)
@@ -176,11 +173,32 @@ def post_list(request):
         response = {"tags": serializer_tag.data, "post": serializer_post.data}
         return JsonResponse(response)
 
+@ csrf_exempt
+def post_all(request):
+    if request.method == 'POST' or request.method == 'GET':
+        posts = Post.objects.all().exclude(title="Dummy")
+        tags = []
+        for pos in posts:
+            try:
+                r = Relationship.objects.get(post=pos)                    
+                t = Tag.objects.get(title=r.tag).title
+                i = pos.id 
+                tags.append({"id": i, 'title': t})
+            except Relationship.DoesNotExist:
+                r = None
+        serializer_post = Post1Serializer(posts, many=True)
+        # serializer_tag = TagSerializer(tags, many=True)
+        response = {"tags": tags, "post": serializer_post.data}
+        return JsonResponse(response)
+
 
 @ csrf_exempt
 def post_list_for_key(request):
-    if request.method == 'POST':
-        key = request.POST['key']
+    if request.method == 'POST' or request.method == 'GET':
+        # key = request.POST['key']
+        # key = request.POST.get('key', False)
+        print(request.body)
+        key = json.loads(request.body)['key']
         posts = Post.objects.all().filter(~Q(title="Dummy"))
         selected_posts = get_search_list(posts, key=key)
         tags = Tag.objects.all()
@@ -207,19 +225,21 @@ def admin_removetag(request):
     slug = request.POST['slug']
     tag_t = request.POST['tag']
     post = get_object_or_404(Post, slug=slug)
-    tag = Tag.objects.get()
-    relas = Relationship.objects.filter(post=post, )
+    relas = Relationship.objects.filter(post=post)
     tag_list = []
     for r in relas:
-        if tag_t == r.tag.title:
+        r_t = r.tag.title
+        if tag_t == r_t:
             r.delete()
         else:
-            tag_list.append(Tag.objects.get(title=r.tag.title).title)
-    return JsonResponse(tag_list, safe=False)
+            tag_list.append(r.tag.id)
+    new_query = Tag.objects.filter(pk__in=tag_list)
+    new_tag_list = TagSerializer(new_query, many=True)
+    return JsonResponse(new_tag_list.data, safe=False)
 
 @ csrf_exempt
 def admin_setnext(request):
-    slug = request.POST['slug']
+    slug = request.POST['slug']      
     next_slug = request.POST['nextSlug']
     post = get_object_or_404(Post, slug=slug)
     next = get_object_or_404(Post, slug=next_slug)
@@ -446,7 +466,20 @@ def admin_search_post(request):
     response = {"tags": serializer_tag.data, "post": serializer_post.data}
     return JsonResponse(response)
 
+@ csrf_exempt
+def admin_saveModel(request):
+    slug = request.POST['slug']
+    post = Post.objects.get(slug=slug)
 
+    if request.method == 'POST':
+        if 'modelLink' in request.POST:
+            post.modelLink = request.POST['modelLink']
+        if 'features' in request.POST:
+            post.features = str(request.POST['features'])
+        post.save()
+        jsondata = {"slug": slug}
+        return JsonResponse(jsondata)
+    
 @ csrf_exempt
 def admin_side(request):
     slug = request.POST['slug']
@@ -478,11 +511,9 @@ def admin_side(request):
             post.video = request.POST['video']
         if 'topic' in request.POST:
             post.topic = request.POST['topic']
-        # print(request.FILES)
-        # print(request.POST)
+
         tags = json.loads(tag_data)
         for t in tags["data"]:
-            # print(t)
             try:
                 t_obj = Tag.objects.get(title=t)
                 try:
@@ -847,7 +878,7 @@ def create_comment(request, slug):
         text = request.POST['text']
         reply_to = request.POST['reply_to']
         email = request.POST['email']
-        if reply_to == 'null':
+        if reply_to == 'null' or reply_to == 'undefined':
             reply_to = None
         else:
             reply_to = Comment.objects.get(pk=int(reply_to))

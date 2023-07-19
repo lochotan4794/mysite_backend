@@ -1,5 +1,5 @@
 # importing base image
-FROM python:3.8
+FROM python:3.11
 
 # updating docker host or host machine
 RUN apt-get update \
@@ -11,6 +11,8 @@ WORKDIR /usr/src/app
 
 # copying requirement.txt file to present working directory
 COPY requirements.txt ./
+
+RUN python3.11 -m pip install --upgrade pip
 
 # installing dependency in container
 RUN pip install -r requirements.txt

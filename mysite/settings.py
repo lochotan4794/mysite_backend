@@ -15,8 +15,6 @@ from datetime import timedelta
 import os
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,11 +28,11 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 SECRET_KEY = 'django-insecure-f$tx09suq-(baomq^l%-u6^zmtw&#ts-983dg(tu-vs_-!piuy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64',
-                 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*']
+                 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*', 'MLP-env.eba-jtfe54fj.us-east-1.elasticbeanstalk.com']
 
 
 EMAIL_USE_TLS = True
@@ -82,17 +80,8 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.BasicAuthentication',
-    #     'rest_framework.authentication.SessionAuthentication',
-    # ]
+    ],
 }
-
-# AUTHENTICATION_BACKENDS = (
-#    "django.contrib.auth.backends.ModelBackend",
-#    "allauth.account.auth_backends.AuthenticationBackend"
-# )
 
 INSTALLED_APPS = [
     'polls.apps.PollsConfig',
@@ -105,7 +94,6 @@ INSTALLED_APPS = [
     'users',
     'registration',
     'rest_framework',
-    'rest_framework.authtoken',
     'blog',
     'corsheaders',
     'storages',
@@ -137,12 +125,11 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://master.d8vadauh948tl.amplifyapp.com',
     'https://www.machinelearningpractices.com',
+    'https://main.d327r1xj0hktnp.amplifyapp.com'
 ]
 
-
-
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com', 'https://www.machinelearningpractices.com']
+    'https://*.127.0.0.1', 'https://master.d8vadauh948tl.amplifyapp.com', 'https://www.machinelearningpractices.com', 'https://main.d327r1xj0hktnp.amplifyapp.com']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -229,39 +216,53 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #         }
 #     }
 
-if 'RDS_DB_NAME' in os.environ:
-    DATABASES = {
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             # 'NAME': 'postgres',
-            'NAME': os.environ['USER_DB_NAME'],
+            'NAME': 'NEW3',
             'USER': 'postgres',
             # 'PASSWORD': 'Password4794',
-            'PASSWORD': 'Password4794',
+            'PASSWORD': 'postgres',
             # 'HOST': 'localhost',
-            'HOST': 'awseb-e-2rd5cgb3mt-stack-awsebrdsdatabase-mvb10m7e45o6.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'HOST': 'awseb-e-pkvunkmq8p-stack-awsebrdsdatabase-kz7ckxh8xyjw.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
         }
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'NEW1',
-            'USER': 'postgres',
-            'PASSWORD': 'Password4794',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        },
-        'users': {
-            'NAME': 'users',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'USER': 'postgres',
-            'PASSWORD': 'Password4794',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
+
+# if 'RDS_DB_NAME' in os.environ:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': 'postgres',
+#             'NAME': os.environ['USER_DB_NAME'],
+#             # 'USER': 'postgres',
+#             # 'PASSWORD': 'Password4794',
+#             'PASSWORD': 'postgres',
+#             # 'HOST': 'localhost',
+#             'HOST': 'awseb-e-yvgtwvutze-stack-awsebrdsdatabase-j6eprzplz4yf.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+#             'PORT': '5432',
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': 'NEW1',
+#             'USER': 'postgres',
+#             'PASSWORD': 'Password4794',
+#             'HOST': 'localhost',
+#             'PORT': '5432',
+#         },
+#         'users': {
+#             'NAME': 'users',
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'USER': 'postgres',
+#             'PASSWORD': 'Password4794',
+#             'HOST': 'localhost',
+#             'PORT': '5432',
+#         }
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
