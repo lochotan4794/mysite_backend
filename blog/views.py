@@ -57,10 +57,9 @@ def get_search_list(posts=[], key=""):
     distances = []
     search_list = []
     for post in posts:
-        # print(post.title)
         distances.append(distance.levenshtein(
-            key.lower().split(" "), post.title.lower().split(" ")))
-    search_list = Nmaxelements(distances, 2, posts)
+            key.lower().split(" "), post.abstract.lower().split(" ")))
+    search_list = Nmaxelements(distances, 5, posts)
     return search_list
 
 
@@ -197,10 +196,14 @@ def post_list_for_key(request):
     if request.method == 'POST' or request.method == 'GET':
         # key = request.POST['key']
         # key = request.POST.get('key', False)
-        print(request.body)
-        key = json.loads(request.body)['key']
-        posts = Post.objects.all().filter(~Q(title="Dummy"))
+        # print(request.body)
+        key = request.POST['key']
+        print("123")
+        # key = json.loads(request.body)['key']
+        # key = 'Minimal'
+        posts = Post.objects.all().filter(~Q(title="Dummy") & (Q(title__icontains=key) | Q(abstract__icontains=key)))
         selected_posts = get_search_list(posts, key=key)
+        print(selected_posts)
         tags = Tag.objects.all()
         serializer_tag = TagSerializer(tags, many=True)
         serializer_post = PostSerializer(selected_posts, many=True)

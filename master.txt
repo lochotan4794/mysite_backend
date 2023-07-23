@@ -3,6 +3,3 @@ Master username
 postgres
 Master password
 iAic17HXQ3lkUlySHBx3Copy
-
-
-123

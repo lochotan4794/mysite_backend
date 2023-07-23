@@ -99,26 +99,48 @@ INSTALLED_APPS = [
     'storages',
 ]
 
-if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
+#     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-    AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
+#     AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+#     AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
 
-    AWS_S3_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-    AWS_S3_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
-    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+#     AWS_S3_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+#     AWS_S3_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+#     AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
-    STATICFILES_LOCATION = 'static'
-    MEDIAFILES_LOCATION = 'media'
+#     STATICFILES_LOCATION = 'static'
+#     MEDIAFILES_LOCATION = 'media'
 
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images/')
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#     MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images/')
+#     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN,
+#     STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN,
+#                                      STATICFILES_LOCATION)
+#     MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+
+# if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_STORAGE_BUCKET_NAME = 'backend-production-store'
+AWS_S3_REGION_NAME = 'us-east-1'
+
+AWS_S3_ACCESS_KEY_ID = 'AKIAWGJYQZXFOHZWCBML'
+AWS_S3_SECRET_ACCESS_KEY = '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'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+STATICFILES_LOCATION = 'static'
+MEDIAFILES_LOCATION = 'media'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN,
                                      STATICFILES_LOCATION)
-    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -136,6 +158,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', #make sure to add this line
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -225,7 +248,7 @@ DATABASES = {
             # 'PASSWORD': 'Password4794',
             'PASSWORD': 'postgres',
             # 'HOST': 'localhost',
-            'HOST': 'awseb-e-pkvunkmq8p-stack-awsebrdsdatabase-kz7ckxh8xyjw.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'HOST': 'database-1.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
         }
     }
