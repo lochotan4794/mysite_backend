@@ -53,4 +53,5 @@ toml==0.10.2
 Unidecode==0.4.21
 urllib3==1.26.12
 websocket-client==0.59.0
-whitenoise==6.2.0
+whitenoise==6.2.
+boto3

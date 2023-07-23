@@ -28,7 +28,10 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 SECRET_KEY = 'django-insecure-f$tx09suq-(baomq^l%-u6^zmtw&#ts-983dg(tu-vs_-!piuy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
+
+if os.getcwd() == '/app':
+    DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64',
@@ -123,7 +126,6 @@ INSTALLED_APPS = [
 # if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
 AWS_STORAGE_BUCKET_NAME = 'backend-production-store'
 AWS_S3_REGION_NAME = 'us-east-1'
 
@@ -140,8 +142,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN,
                                      STATICFILES_LOCATION)
 MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
-
-
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
