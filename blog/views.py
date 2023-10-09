@@ -68,7 +68,7 @@ class PostList(ListCreateAPIView):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        return Post.objects.all()
+        return Post.objects.all().exclude(static=1)
 
 
 @ csrf_exempt
@@ -502,6 +502,8 @@ def admin_side(request):
         post.abstract = request.POST['abstract']
         if 'status' in request.POST['slug']:
             post.status = request.POST['status']
+        if 'staticValue' in request.POST['staticValue']:
+            post.static = request.POST['staticValue']
         if 'thumnail' in request.FILES:
             post.thumnail = request.FILES['thumnail']
         if 'ava' in request.POST:
@@ -782,6 +784,7 @@ def post_detail(request, slug):
         # print("to the end")
         # print(data)
         return JsonResponse(data)
+    
 
 @ csrf_exempt
 @api_view(['GET', 'POST'])

@@ -239,16 +239,30 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #         }
 #     }
 
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             # 'NAME': 'postgres',
+#             'NAME': 'PRO',
+#             'USER': 'postgres',
+#             # 'PASSWORD': 'Password4794',
+#             'PASSWORD': 'postgres',
+#             # 'HOST': 'localhost',
+#             'HOST': 'database-1.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+#             'PORT': '5432',
+#         }
+#     }
+
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             # 'NAME': 'postgres',
             'NAME': 'NEW3',
-            'USER': 'postgres',
+            'USER': 'ubuntu',
             # 'PASSWORD': 'Password4794',
-            'PASSWORD': 'postgres',
+            'PASSWORD': '00279279',
             # 'HOST': 'localhost',
-            'HOST': 'database-1.cmlpjfy9c1op.us-east-1.rds.amazonaws.com',
+            'HOST': 'ec2-3-229-69-255.compute-1.amazonaws.com',
             'PORT': '5432',
         }
     }
