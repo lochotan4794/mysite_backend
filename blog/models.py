@@ -100,6 +100,7 @@ class Post(models.Model):
     features = ArrayField(models.CharField(
         max_length=200), blank=True, unique=False, default=list)
     static = models.IntegerField(default=0)
+    currVer = models.FloatField(default=1.0)
 
     class Meta:
         ordering = ['-created_on']
@@ -108,9 +109,9 @@ class Post(models.Model):
         return self.title
 
     @classmethod
-    def create(cls, title, slug, thumnail, abstract, updated_on, created_on, status, total_visited, eng_ver, lang, static):
+    def create(cls, title, slug, thumnail, abstract, updated_on, created_on, status, total_visited, eng_ver, lang, static, currVer):
         post = cls(title=title, slug=slug, thumnail=thumnail, abstract=abstract, updated_on=updated_on,
-                   created_on=created_on, status=status, total_visited=total_visited, eng_ver=eng_ver, lang=lang, static=static)
+                   created_on=created_on, status=status, total_visited=total_visited, eng_ver=eng_ver, lang=lang, static=static, currVer=currVer)
         # do something with the book
         return post
 

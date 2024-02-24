@@ -261,8 +261,8 @@ DATABASES = {
             'USER': 'ubuntu',
             # 'PASSWORD': 'Password4794',
             'PASSWORD': '00279279',
-            'HOST': 'localhost',
-            # 'HOST': 'ec2-3-229-69-255.compute-1.amazonaws.com',
+            # 'HOST': 'localhost',
+            'HOST': 'ec2-3-229-69-255.compute-1.amazonaws.com',
             'PORT': '5432',
         }
     }

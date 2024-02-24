@@ -516,6 +516,8 @@ def admin_side(request):
             post.video = request.POST['video']
         if 'topic' in request.POST:
             post.topic = request.POST['topic']
+        if 'currVer' in request.POST:
+            post.currVer = request.POST['currVer']
 
         tags = json.loads(tag_data)
         for t in tags["data"]:
@@ -616,36 +618,6 @@ def admin_insert(request):
         serializer_app = AppendixSerializer(app, many=False)
         return JsonResponse(serializer_app.data)
 
-# @ csrf_exempt
-# def post_detail1(request, slug):
-#     """
-#     Retrieve, update or delete a code snippet.
-#     """
-#     post = get_object_or_404(Post, slug=slug)
-#     vs = post.total_visited
-#     post.total_visited = vs + 1
-#     post.save()
-#     # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
-#     #     post.total_visited + 1, post.id])
-#     try:
-#         text = Text.objects.filter(post=post)
-#         appendist = Appendix.objects.filter(post=post)
-#         citation = Citation.objects.filter(post=post)
-#         styles = Style.objects.all()
-#         # print(styles)
-#     except Post.DoesNotExist:
-#         return HttpResponse(status=404)
-
-#     if request.method == 'GET':
-#         serializer_post = PostSerializer(post)
-#         serializer_appendist = AppendixSerializer(appendist, many=True)
-#         serializer_text = TextSerializer(text, many=True)
-#         serializer_citation = CitationSerializer(citation, many=True)
-#         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
-#                 'text': serializer_text.data, 'citation': serializer_citation.data,
-#                 'styles': styles}
-#         return JsonResponse(data)
-
 
 def checkNext(Model, id):
     try:
@@ -661,8 +633,6 @@ def post_detail(request, slug):
     Retrieve, update or delete a code snippet.
     """
     # Get Dummy object
-    print("Recieved Slug")
-    print(slug)
     if slug == "Dummy":
         try:
             dummy = Post.objects.get(title="Dummy")
@@ -684,8 +654,7 @@ def post_detail(request, slug):
     texts = list()
     appendists = list()
     citations = list()
-    # _ = Post.objects.raw("UPDATE blog_post SET total_visited = %s WHERE id = %s", [
-    #     post.total_visited + 1, post.id])
+
     relas = Relationship.objects.filter(post=post)
     for r in relas:
         print(r.tag)
@@ -717,13 +686,8 @@ def post_detail(request, slug):
     for t in appendist:
         series_t = list()
         series_t.append(t.id)
-        # while(hasattr(t, 'next')):
         while(hasattr(t, 'next')):
             t = t.next
-        # while(checkNext(Appendix, t.id)):
-        #     t = Appendix.objects.get(previous=t.id)
-            print("next object")
-            print(t)
             series_t.append(t.id)
         appendists.append(series_t)
 
@@ -735,17 +699,8 @@ def post_detail(request, slug):
             series_t.append(t.id)
         citations.append(series_t)
 
-    # print("LIST")
-    # print(appendists[0])
-
-    # print(citations)
-
     styles = []
     styles = Style.objects.all()
-    # for item in text.iterator():
-    #     style = Style.objects.filter(name=item.role)[0]
-    #     data = StyleSerializer(style).data
-    #     styles.append(data)
 
     if request.method == 'GET':
         serializer_post = PostSerializer(post)
@@ -753,12 +708,6 @@ def post_detail(request, slug):
         a = []
         c = []
 
-        # if len(texts)  > 0:
-        #     t = Text.objects.filter(id__in=texts[0])
-        # if len(appendists) > 0:
-        #     a = Appendix.objects.filter(id__in=appendists[0])
-        # if len(citations) > 0:
-        #     c = Citation.objects.filter(id__in=citations[0])
         if (len(text) > 0):
             for item in texts[0]:
                 t.append(Text.objects.get(id=item))
@@ -769,10 +718,7 @@ def post_detail(request, slug):
             for item in citations[0]:
                 c.append(Citation.objects.get(id=item))
 
-        # print("appendixes")
-        # print(a)
         tags = Tag.objects.all()
-        # print(tags)
         serializer_appendist = AppendixSerializer(a, many=True)
         serializer_text = TextSerializer(t, many=True)
         serializer_citation = CitationSerializer(c, many=True)
@@ -781,10 +727,34 @@ def post_detail(request, slug):
                 'styles': StyleSerializer(styles, many=True).data,
                 'tags': TagSerializer(tags, many=True).data}
 
-        # print("to the end")
-        # print(data)
         return JsonResponse(data)
     
+    
+@ csrf_exempt
+@api_view(['GET', 'POST'])
+def post_text(request):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    post_id = request.POST.get('post_id')
+    post = Post.objects.get(pk=post_id)
+    vs = post.total_visited
+    post.total_visited = vs + 1
+    post.save()
+    try:
+        text = Text.objects.filter(post=post).order_by('-date_created')
+        styles = []
+        for item in text.iterator():
+            style = Style.objects.filter(name=item.type)[0]
+            data = StyleSerializer(style).data
+            styles.append(data)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'POST':
+        serializer_text = TextSerializer(text, many=True)
+        data = {'text': serializer_text.data, 'styles': styles}
+        return JsonResponse(data)
 
 @ csrf_exempt
 @api_view(['GET', 'POST'])
