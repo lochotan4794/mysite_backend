@@ -925,6 +925,7 @@ def update_comment(request, slug):
 #             return redirect(self.request.path_info)
 
 @ csrf_exempt
+@api_view(['GET', 'POST'])
 def image_upload_view(request):
     """Process images uploaded by users"""
     if 'image' in request.FILES:
