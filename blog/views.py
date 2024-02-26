@@ -4,11 +4,11 @@ from time import time
 from django.http import JsonResponse
 # Create your views here.
 from rest_framework.generics import ListCreateAPIView
-from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, RelationshipSerializer
+from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, RelationshipSerializer, ImageSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
-from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag
+from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag, Image
 # from .forms import ImageForm
 import distance
 from django.contrib.auth.models import User
@@ -498,6 +498,10 @@ def admin_side(request):
     post.title = request.POST['title']
     post.slug = slug
 
+    print(request.POST)
+    print(request.POST['currVer'])
+
+
     if request.method == 'POST':
         post.abstract = request.POST['abstract']
         if 'status' in request.POST['slug']:
@@ -517,7 +521,9 @@ def admin_side(request):
         if 'topic' in request.POST:
             post.topic = request.POST['topic']
         if 'currVer' in request.POST:
-            post.currVer = request.POST['currVer']
+            post.currVer = float(request.POST['currVer'])
+
+        
 
         tags = json.loads(tag_data)
         for t in tags["data"]:
@@ -546,6 +552,7 @@ def admin_side(request):
             except Post.DoesNotExist:
                 eng_ver = None
             post.eng_ver = eng_ver
+        print(post.currVer)
         post.save()
         jsondata = {"slug": slug}
         return JsonResponse(jsondata)
@@ -917,16 +924,12 @@ def update_comment(request, slug):
 #             new_comment.save()
 #             return redirect(self.request.path_info)
 
-
+@ csrf_exempt
 def image_upload_view(request):
     """Process images uploaded by users"""
-    if request.method == 'POST':
-        form = ImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            # Get the current instance object to display in the template
-            img_obj = form.instance
-            return render(request, 'blog/index.html', {'form': form, 'img_obj': img_obj})
-    else:
-        form = ImageForm()
-    return render(request, 'blog/index.html', {'form': form})
+    if 'image' in request.FILES:
+        image = request.FILES['file']
+        img = Image.create(image)
+        img.save()
+        serializer_app = ImageSerializer(img, many=False)
+        return JsonResponse(serializer_app.data)

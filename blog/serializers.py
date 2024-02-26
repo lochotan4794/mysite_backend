@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from blog.models import Post, Relationship, Text, Appendix, Citation, Comment, Tag, Style
+from blog.models import Post, Relationship, Text, Appendix, Citation, Comment, Tag, Style, Image
 from rest_framework.fields import ListField
 
 
@@ -82,6 +82,12 @@ class PostSerializer(serializers.ModelSerializer):
         # def get_related_field(self, model_field):
         #     return PostSerializer()
 
+
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = ('image')
 
 class Post1Serializer(serializers.ModelSerializer):
     # tag = TagSerializer(many=True)

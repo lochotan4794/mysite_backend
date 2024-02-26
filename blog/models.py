@@ -115,10 +115,10 @@ class Post(models.Model):
         # do something with the book
         return post
 
-    # def save(self, *args, **kwargs):
-    #         if getattr(self, 'features_changed', True):
-    #             print(self.features)
-    #         super(Post, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+            if getattr(self, 'features_changed', True):
+                print(self.features)
+            super(Post, self).save(*args, **kwargs)
 
 class Index(models.Model):
     post = models.ForeignKey(
@@ -127,6 +127,17 @@ class Index(models.Model):
     type = models.IntegerField(default=0)
     id_type = models.IntegerField(choices=COMPONENT, default=0)
     style_id = models.IntegerField(choices=TEXT_FUNCTIONAL)
+
+
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='images', blank=True)
+
+    @classmethod
+    def create(cls, image=image):
+        # do something with the book
+        img = cls(image=image)
+        return img
 
 
 class Text(models.Model):
