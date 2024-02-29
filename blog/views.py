@@ -1097,7 +1097,10 @@ def format_text(text, style):
     if style == "head4":
         return '<p className="h3_text">' + text.content + '</p>'
     if style == 'html':
-        return text
+        return text.content
+    if style == 'citation':
+        return '<li>' + text + '</li>'
+    return str(text)
     
 TEXT_FUNCTIONAL = (
     (0, "paragraph"),
@@ -1121,8 +1124,12 @@ TEXT_FUNCTIONAL = (
     
 def map_text_func(text_func):
 
-    if text_func == 0 or text_func == 2 or text_func == 3 or text_func == 4 or text_func == 5:
+    if text_func == 0 or text_func == 2 or text_func == 3:
         return 'paragraph'
+    if text_func == 4:
+        return 'citation'
+    if text_func == 5:
+        return 'appendix'
     if text_func == 1:
         return 'image'
     if text_func == 10:
@@ -1193,7 +1200,7 @@ def to_html(request):
     
     text_sum = ''
     appendix_sum = ''
-    citation_sum = ''
+    citation_sum = '<h3>References</h3>'
 
 
     for t in text:
