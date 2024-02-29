@@ -1087,7 +1087,7 @@ def format_text(text, style):
     if style == "code":
         return '<pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
     if style == "image":
-        return '<figure className="figure_in_post"><img className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
+        return '<figure className="figure_in_post"><img loading="lazy" className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
     if style == "head1":
         return '<p className="h2_text">' + text.content + '</p>'
     if style == "head2":
