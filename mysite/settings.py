@@ -34,8 +34,8 @@ if os.getcwd() == '/app':
     DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64',
-                 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*', 'MLP-env.eba-jtfe54fj.us-east-1.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['backend-env-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', '172.31.6.64', 'http://127.0.0.1:8000/blog/upload/image/',
+                 'backend-env-production.us-east-1.elasticbeanstalk.com', 'centralglobalbackend.de', 'blog.centralglobalbackend.de', 'localhost', '127.0.0.1', '*', 'MLP-env.eba-jtfe54fj.us-east-1.elasticbeanstalk.com', 'www.machinelearningpractices.com']
 
 
 EMAIL_USE_TLS = True

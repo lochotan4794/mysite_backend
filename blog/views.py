@@ -4,11 +4,11 @@ from time import time
 from django.http import JsonResponse
 # Create your views here.
 from rest_framework.generics import ListCreateAPIView
-from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, RelationshipSerializer, ImageSerializer
+from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, HTMLSerializer, ImageSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
-from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag, Image
+from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag, Image, HTML
 # from .forms import ImageForm
 import distance
 from django.contrib.auth.models import User
@@ -126,31 +126,35 @@ def post_list_relative(request, slug):
         # for r in relative:
         #     posts = Post.objects.raw('SELECT * FROM blog_post WHERE id = %s',
         #                              r.post_id) | posts
+        try:
+            posts = Post.objects.raw('SELECT  p.id, p.title, p.slug FROM blog_post p, blog_relationship r WHERE p.id = r.post_id AND r.tag_id=%s ORDER BY p.total_visited DESC',
+                                    relationships.values_list('tag', flat=True))
 
-        posts = Post.objects.raw('SELECT  p.id, p.title, p.slug FROM blog_post p, blog_relationship r WHERE p.id = r.post_id AND r.tag_id=%s ORDER BY p.total_visited DESC',
-                                 relationships.values_list('tag', flat=True))
+            # if len(tags) == 0 or tags is None:
+            #     return JsonResponse([])
 
-        # if len(tags) == 0 or tags is None:
-        #     return JsonResponse([])
+            # # t = Tag.objects.filter(title=tags[0])
+            # # print(t)
+            # r = Relationship.objects.filter(tag=tags[0])
+            # posts = Post.objects.filter(pk=r.values_list("post_id"))
+            # print(posts)
 
-        # # t = Tag.objects.filter(title=tags[0])
-        # # print(t)
-        # r = Relationship.objects.filter(tag=tags[0])
-        # posts = Post.objects.filter(pk=r.values_list("post_id"))
-        # print(posts)
+            # if len(tags) > 1:
+            #     for t in tags:
+            #         r = Relationship.objects.filter(tag=t)
+            #         relative = Post.objects.filter(pk=r.values_list("post_id"))
+            #         posts = posts | relative
+            # # print(tags[0])
+            selected = posts
 
-        # if len(tags) > 1:
-        #     for t in tags:
-        #         r = Relationship.objects.filter(tag=t)
-        #         relative = Post.objects.filter(pk=r.values_list("post_id"))
-        #         posts = posts | relative
-        # # print(tags[0])
-        selected = posts
-        if len(list(selected)) > 5:
-            selected = selected[0:4]
-        serializer_post = PostSerializer(selected, many=True)
-        return JsonResponse(serializer_post.data, safe=False)
-        # return JsonResponse([], safe=False)
+            if len(list(selected)) == 0:
+                return JsonResponse({200:"ok"}, safe=False)
+            if len(list(selected)) > 5:
+                selected = selected[0:4]
+            serializer_post = PostSerializer(selected, many=True)
+            return JsonResponse(serializer_post.data, safe=False)
+        except Post.DoesNotExist:
+            return JsonResponse([], safe=False)
 
 
 @ csrf_exempt
@@ -499,14 +503,14 @@ def admin_side(request):
     post.slug = slug
 
     print(request.POST)
-    print(request.POST['currVer'])
+    print(request.POST['staticValue'])
 
 
     if request.method == 'POST':
         post.abstract = request.POST['abstract']
-        if 'status' in request.POST['slug']:
+        if 'status' in request.POST:
             post.status = request.POST['status']
-        if 'staticValue' in request.POST['staticValue']:
+        if 'staticValue' in request.POST:
             post.static = request.POST['staticValue']
         if 'thumnail' in request.FILES:
             post.thumnail = request.FILES['thumnail']
@@ -633,9 +637,8 @@ def checkNext(Model, id):
     except Model.DoesNotExist:
         return False
 
-
 @ csrf_exempt
-def post_detail(request, slug):
+def post_edit(request, slug):
     """
     Retrieve, update or delete a code snippet.
     """
@@ -729,6 +732,121 @@ def post_detail(request, slug):
         serializer_appendist = AppendixSerializer(a, many=True)
         serializer_text = TextSerializer(t, many=True)
         serializer_citation = CitationSerializer(c, many=True)
+        data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
+                'text': serializer_text.data, 'citation': serializer_citation.data,
+                'styles': StyleSerializer(styles, many=True).data,
+                'tags': TagSerializer(tags, many=True).data}
+
+        return JsonResponse(data)
+    
+
+@ csrf_exempt
+def post_detail(request, slug):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    # Get Dummy object
+    print(slug)
+    if slug == "Dummy":
+        try:
+            dummy = Post.objects.get(title="Dummy")
+        except Post.DoesNotExist:
+            dummy = Post.create(title="Dummy", slug="Dummy", thumnail=None, abstract="Dummy", updated_on=datetime.datetime.now(
+            ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0)
+            dummy.save()
+        serializer_app = PostSerializer(dummy, many=False)
+        data = {'post': serializer_app.data, 'appendix': [],
+                'text': [], 'citation': [],
+                'styles': []}
+        return JsonResponse(data)
+
+    post = get_object_or_404(Post, slug=slug)
+
+    if post.static == 2:
+        vs = post.total_visited
+        post.total_visited = vs + 1
+        post.save()
+        html = HTML.objects.get(slug=slug)
+        serializer_html = HTMLSerializer(html, many=False)
+        serializer_post= PostSerializer(post, many=False)
+        data = {'post': serializer_post.data, 'html': serializer_html.data}
+        return JsonResponse(data)
+
+    vs = post.total_visited
+    post.total_visited = vs + 1
+    post.save()
+    texts = list()
+    appendists = list()
+    citations = list()
+
+    relas = Relationship.objects.filter(post=post)
+    for r in relas:
+        print(r.tag)
+
+    try:
+        text = Text.objects.filter(post=post).filter(previous__isnull=True)
+        appendist = Appendix.objects.filter(
+            post=post).filter(previous__isnull=True)
+        citation = Citation.objects.filter(
+            post=post).filter(previous__isnull=True)
+
+        relationship = Relationship.objects.filter(post=post)
+
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+
+    for t in text:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            series_t.append(t.id)
+        texts.append(series_t)
+
+    Rs = []
+    for r in relationship:
+        Rs.append(r.tag.title)
+
+    for t in appendist:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            series_t.append(t.id)
+        appendists.append(series_t)
+
+    for t in citation:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            series_t.append(t.id)
+        citations.append(series_t)
+
+    styles = []
+    styles = Style.objects.all()
+
+    if request.method == 'GET':
+        serializer_post = PostSerializer(post)
+        t = []
+        a = []
+        c = []
+
+        if (len(text) > 0):
+            for item in texts[0]:
+                t.append(Text.objects.get(id=item))
+        if (len(appendists) > 0):
+            for item in appendists[0]:
+                a.append(Appendix.objects.get(id=item))
+        if (len(citations) > 0):
+            for item in citations[0]:
+                c.append(Citation.objects.get(id=item))
+
+        tags = Tag.objects.all()
+        serializer_appendist = AppendixSerializer(a, many=True)
+        serializer_text = TextSerializer(t, many=True)
+        serializer_citation = CitationSerializer(c, many=True)
+        print(TagSerializer(tags, many=True).data)
         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
                 'text': serializer_text.data, 'citation': serializer_citation.data,
                 'styles': StyleSerializer(styles, many=True).data,
@@ -928,9 +1046,191 @@ def update_comment(request, slug):
 @api_view(['GET', 'POST'])
 def image_upload_view(request):
     """Process images uploaded by users"""
-    if 'image' in request.FILES:
+    if 'file' in request.FILES:
         image = request.FILES['file']
         img = Image.create(image)
         img.save()
         serializer_app = ImageSerializer(img, many=False)
         return JsonResponse(serializer_app.data)
+    
+@ csrf_exempt
+@api_view(['GET', 'POST'])
+def html_save(request):
+    """Process images uploaded by users"""
+    slug = request.POST['slug']
+    abstract = request.POST['abstract']
+    content = request.POST['content']
+    try:
+        html = HTML.objects.get(slug=slug)
+        html.content = content
+        html.abstract = abstract
+        html.save()
+    except HTML.DoesNotExist:
+        html = HTML.create(slug, abstract, content)
+        html.save()
+    serializer_app = HTMLSerializer(html, many=False)
+    return JsonResponse(serializer_app.data)
+
+
+@ csrf_exempt
+@api_view(['GET', 'POST'])
+def get_html(request):
+    """Process images uploaded by users"""
+    slug = request.POST['slug']
+    html = HTML.objects.get(slug=slug)
+    serializer_app = HTMLSerializer(html, many=False)
+    return JsonResponse(serializer_app.data)
+
+def format_text(text, style):
+    if style == "paragraph":
+        return '<p class="post-body-text" >' + text + '</p>'
+    if style == "code":
+        return '<pre><code class="language-python">' + text + '</code></pre>'
+    if style == "image":
+        return '<figure><img maxWidth=`50%` src="' + text + '"></img></figure>'
+    if style == "head1":
+        return '<div class="h2-text">' + text + '</div>'
+    if style == "head2":
+        return '<div class="h2-text">' + text + '</div>'
+    if style == "head3":
+        return '<div class="h3-text">' + text + '</div>'
+    if style == "head4":
+        return '<div class="h3-text">' + text + '</div>'
+    if style == 'html':
+        return text
+    
+TEXT_FUNCTIONAL = (
+    (0, "paragraph"),
+    (1, "image"),
+    (2, "header"),
+    (3, "link"),
+    (4, "citation"),
+    (5, "appendix"),
+    (6, "h1"),
+    (7, "h2"),
+    (8, "h3"),
+    (9, "h4"),
+    (10, "code"),
+    (11, 'ol'),
+    (12, 'video'),
+    (13, 'html'),
+    (14, 'html_styled'),
+    (15, 'math'),
+    (16, 'table'),
+    (17, 'img_src'))
+    
+def map_text_func(text_func):
+
+    if text_func == 0 or text_func == 2 or text_func == 3 or text_func == 4 or text_func == 5:
+        return 'paragraph'
+    if text_func == 1:
+        return 'image'
+    if text_func == 10:
+        return 'code'
+    if text_func == 6:
+        return 'head1'
+    if text_func == 7:
+        return 'head2'
+    if text_func == 8:
+        return 'head3'
+    if text_func == 9:
+        return 'head4'
+    if text_func == 13:
+        return 'html'
+    return 'paragraph'
+    
+@ csrf_exempt
+@api_view(['GET', 'POST'])
+def to_html(request):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    # # Get Dummy object
+    # if slug == "Dummy":
+    #     try:
+    #         dummy = Post.objects.get(title="Dummy")
+    #     except Post.DoesNotExist:
+    #         dummy = Post.create(title="Dummy", slug="Dummy", thumnail=None, abstract="Dummy", updated_on=datetime.datetime.now(
+    #         ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0)
+    #         dummy.save()
+    #     serializer_app = PostSerializer(dummy, many=False)
+    #     data = {'post': serializer_app.data, 'appendix': [],
+    #             'text': [], 'citation': [],
+    #             'styles': []}
+    #     return JsonResponse(data)
+    slug = request.POST['slug']
+
+    
+    post = get_object_or_404(Post, slug=slug)
+
+    # if post.static == 2:
+    #     vs = post.total_visited
+    #     post.total_visited = vs + 1
+    #     post.save()
+    #     html = HTML.objects.get(slug=slug)
+    #     serializer_app = HTMLSerializer(html, many=False)
+    #     return JsonResponse(serializer_app.data)
+
+    # vs = post.total_visited
+    # post.total_visited = vs + 1
+    # post.save()
+
+    relas = Relationship.objects.filter(post=post)
+    for r in relas:
+        print(r.tag)
+
+    try:
+        text = Text.objects.filter(post=post).filter(previous__isnull=True)
+        appendist = Appendix.objects.filter(
+            post=post).filter(previous__isnull=True)
+        citation = Citation.objects.filter(
+            post=post).filter(previous__isnull=True)
+
+        relationship = Relationship.objects.filter(post=post)
+
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+    
+    text_sum = ''
+    appendix_sum = ''
+    citation_sum = ''
+
+
+    for t in text:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            text_sum = text_sum + format_text(t.content, map_text_func(t.role))
+
+    Rs = []
+    for r in relationship:
+        Rs.append(r.tag.title)
+
+    for t in appendist:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            appendix_sum = appendix_sum + format_text(t.text, 'paragraph')
+
+    for t in citation:
+        series_t = list()
+        series_t.append(t.id)
+        while(hasattr(t, 'next')):
+            t = t.next
+            citation_sum = citation_sum + format_text(t.text, 'paragraph')
+    
+
+    content = appendix_sum + text_sum + citation_sum
+
+    try:
+        html = HTML.objects.get(slug=slug)
+        html.content = content
+        html.save()
+    except HTML.DoesNotExist:
+        html = HTML.create(slug=slug, abstract=slug, content=content)
+        html.save()
+    serializer_app = HTMLSerializer(html, many=False)
+    return JsonResponse(serializer_app.data)
+

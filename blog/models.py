@@ -139,6 +139,23 @@ class Image(models.Model):
         img = cls(image=image)
         return img
 
+class HTML(models.Model):
+
+    content = models.TextField(blank=True)
+    slug = models.CharField(max_length=100, blank=True)
+    abstract = models.CharField(max_length=1000, unique=True, blank=True)
+
+    @classmethod
+    def create(cls, slug, abstract, content):
+        html = cls(slug=slug, abstract=abstract, content=content)
+        # do something with the book
+        return html
+
+    class Meta:
+        ordering = ['content']
+
+    def __str__(self):
+        return self.content
 
 class Text(models.Model):
     post = models.ForeignKey(

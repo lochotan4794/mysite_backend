@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from blog.models import Post, Relationship, Text, Appendix, Citation, Comment, Tag, Style, Image
+from blog.models import Post, Relationship, Text, Appendix, Citation, Comment, Tag, Style, Image, HTML
 from rest_framework.fields import ListField
 
 
@@ -7,6 +7,11 @@ class StyleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Style
         fields = ('name', 'indentLevel', 'fontSize', 'decor', 'fontWeight')
+
+class HTMLSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HTML
+        fields = ('slug', 'abstract', 'content')
 
 
 class TextSerializer(serializers.ModelSerializer):
@@ -87,7 +92,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Image
-        fields = ('image')
+        fields = ('image',)
 
 class Post1Serializer(serializers.ModelSerializer):
     # tag = TagSerializer(many=True)
