@@ -1083,19 +1083,19 @@ def get_html(request):
 
 def format_text(text, style):
     if style == "paragraph":
-        return '<p class="post-body-text" >' + text + '</p>'
+        return '<p className="post-body-text" >' + text.content + '</p>'
     if style == "code":
-        return '<pre><code class="language-python">' + text + '</code></pre>'
+        return '<pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
     if style == "image":
-        return '<figure><img maxWidth=`50%` src="' + text + '"></img></figure>'
+        return '<figure className="figure_in_post"><img className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
     if style == "head1":
-        return '<div class="h2-text">' + text + '</div>'
+        return '<p className="h2_text">' + text.content + '</p>'
     if style == "head2":
-        return '<div class="h2-text">' + text + '</div>'
+        return '<p className="h2_text">' + text.content + '</p>'
     if style == "head3":
-        return '<div class="h3-text">' + text + '</div>'
+        return '<p className="h3_text">' + text.content + '</p>'
     if style == "head4":
-        return '<div class="h3-text">' + text + '</div>'
+        return '<p className="h3_text">' + text.content + '</p>'
     if style == 'html':
         return text
     
@@ -1201,7 +1201,7 @@ def to_html(request):
         series_t.append(t.id)
         while(hasattr(t, 'next')):
             t = t.next
-            text_sum = text_sum + format_text(t.content, map_text_func(t.role))
+            text_sum = text_sum + format_text(t, map_text_func(t.role))
 
     Rs = []
     for r in relationship:
