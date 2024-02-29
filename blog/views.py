@@ -1100,6 +1100,8 @@ def format_text(text, style):
         return text.content
     if style == 'citation':
         return '<li>' + text + '</li>'
+    if style == 'appendix':
+        return '<li><a>' + text + '</a></li>'
     return str(text)
     
 TEXT_FUNCTIONAL = (
@@ -1219,14 +1221,14 @@ def to_html(request):
         series_t.append(t.id)
         while(hasattr(t, 'next')):
             t = t.next
-            appendix_sum = appendix_sum + format_text(t.text, 'paragraph')
+            appendix_sum = appendix_sum + format_text(t.text, "appendix")
 
     for t in citation:
         series_t = list()
         series_t.append(t.id)
         while(hasattr(t, 'next')):
             t = t.next
-            citation_sum = citation_sum + format_text(t.text, 'paragraph')
+            citation_sum = citation_sum + format_text(t.text, "citation")
     
 
     content = appendix_sum + text_sum + citation_sum
