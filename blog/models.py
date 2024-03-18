@@ -100,7 +100,7 @@ class Post(models.Model):
     features = ArrayField(models.CharField(
         max_length=200), blank=True, unique=False, default=list)
     static = models.IntegerField(default=0)
-    currVer = models.FloatField(default=1.0)
+    currVer = models.FloatField(default=1.0, blank=True)
 
     class Meta:
         ordering = ['-created_on']

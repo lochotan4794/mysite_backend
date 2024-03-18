@@ -14,6 +14,11 @@ from pathlib import Path
 from datetime import timedelta
 import os
 
+import django
+from django.utils.encoding import force_str
+django.utils.encoding.force_text = force_str
+import six
+from urllib.parse import urlsplit, urlunsplit, unquote
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

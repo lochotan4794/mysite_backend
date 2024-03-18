@@ -497,7 +497,7 @@ def admin_side(request):
         post = Post.objects.get(slug=slug)
     except Post.DoesNotExist:
         post = Post.create(title="Dummy", slug=slug, thumnail=None, abstract="Dummy", updated_on=datetime.datetime.now(
-        ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0, static=0)
+        ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0, static=0, currVer=1.0)
 
     post.title = request.POST['title']
     post.slug = slug

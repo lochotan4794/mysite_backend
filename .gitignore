@@ -4,6 +4,8 @@
 # !.elasticbeanstalk/*.cfg.yml
 # !.elasticbeanstalk/*.global.yml
 .elasticbeanstalk/app_versions/*
+.venv/*
+.venv/
 .env/*
 .env/
 Archive.zip
