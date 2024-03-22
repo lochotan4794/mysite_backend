@@ -1208,6 +1208,7 @@ def to_html(request):
     for t in text:
         series_t = list()
         series_t.append(t.id)
+        text_sum = format_text(t, map_text_func(t.role));
         while(hasattr(t, 'next')):
             t = t.next
             text_sum = text_sum + format_text(t, map_text_func(t.role))
@@ -1219,6 +1220,7 @@ def to_html(request):
     for t in appendist:
         series_t = list()
         series_t.append(t.id)
+        appendix_sum = format_text(t.text, "appendix")
         while(hasattr(t, 'next')):
             t = t.next
             appendix_sum = appendix_sum + format_text(t.text, "appendix")
@@ -1226,6 +1228,7 @@ def to_html(request):
     for t in citation:
         series_t = list()
         series_t.append(t.id)
+        citation_sum = format_text(t.text, "citation")
         while(hasattr(t, 'next')):
             t = t.next
             citation_sum = citation_sum + format_text(t.text, "citation")
