@@ -527,8 +527,6 @@ def admin_side(request):
         if 'currVer' in request.POST:
             post.currVer = float(request.POST['currVer'])
 
-        
-
         tags = json.loads(tag_data)
         for t in tags["data"]:
             try:
@@ -1099,9 +1097,9 @@ def format_text(text, style):
     if style == 'html':
         return text.content
     if style == 'citation':
-        return '<li>' + text + '</li>'
+        return '<li className="citation">' + text + '</li>'
     if style == 'appendix':
-        return '<li><a>' + text + '</a></li>'
+        return '<li className="appendix" ><a>' + text + '</a></li>'
     return str(text)
     
 TEXT_FUNCTIONAL = (
