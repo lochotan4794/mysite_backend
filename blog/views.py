@@ -1231,7 +1231,7 @@ def to_html(request):
             citation_sum = citation_sum + format_text(t.text, "citation")
     
 
-    content = "<div className=`appendix_container`>" + appendix_sum + "</div>" + text_sum + citation_sum
+    content = '<div className="appendix_container">' + appendix_sum + "</div>" + text_sum + citation_sum
 
     try:
         html = HTML.objects.get(slug=slug)
