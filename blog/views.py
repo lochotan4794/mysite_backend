@@ -1166,7 +1166,6 @@ def to_html(request):
     #             'styles': []}
     #     return JsonResponse(data)
     slug = request.POST['slug']
-
     
     post = get_object_or_404(Post, slug=slug)
 
@@ -1204,8 +1203,8 @@ def to_html(request):
 
 
     for t in text:
-        series_t = list()
-        series_t.append(t.id)
+        # series_t = list()
+        # series_t.append(t.id)
         text_sum = format_text(t, map_text_func(t.role));
         while(hasattr(t, 'next')):
             t = t.next
@@ -1216,16 +1215,16 @@ def to_html(request):
         Rs.append(r.tag.title)
 
     for t in appendist:
-        series_t = list()
-        series_t.append(t.id)
+        # series_t = list()
+        # series_t.append(t.id)
         appendix_sum = format_text(t.text, "appendix")
         while(hasattr(t, 'next')):
             t = t.next
             appendix_sum = appendix_sum + format_text(t.text, "appendix")
 
     for t in citation:
-        series_t = list()
-        series_t.append(t.id)
+        # series_t = list()
+        # series_t.append(t.id)
         citation_sum = format_text(t.text, "citation")
         while(hasattr(t, 'next')):
             t = t.next
