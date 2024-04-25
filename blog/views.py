@@ -1080,17 +1080,17 @@ def get_html(request):
     return JsonResponse(serializer_app.data)
 
 def format_text(text, style):
-    if style == "paragraph":
+    if style == 'paragraph':
         return '<p className="post-body-text" >' + text.content + '</p>'
-    if style == "code":
+    if style == 'code':
         return '<pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
-    if style == "image":
+    if style == 'image':
         return '<figure className="figure_in_post"><img loading="lazy" className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
-    if style == "head1":
+    if style == 'head1':
         return '<p className="h2_text">' + text.content + '</p>'
-    if style == "head2":
+    if style == 'head2':
         return '<p className="h2_text">' + text.content + '</p>'
-    if style == "head3":
+    if style == 'head3':
         return '<p className="h3_text">' + text.content + '</p>'
     if style == "head4":
         return '<p className="h3_text">' + text.content + '</p>'
@@ -1217,18 +1217,18 @@ def to_html(request):
     for t in appendist:
         # series_t = list()
         # series_t.append(t.id)
-        appendix_sum = format_text(t.text, "appendix")
+        appendix_sum = format_text(t.text, 'appendix')
         while(hasattr(t, 'next')):
             t = t.next
-            appendix_sum = appendix_sum + format_text(t.text, "appendix")
+            appendix_sum = appendix_sum + format_text(t.text, 'appendix')
 
     for t in citation:
         # series_t = list()
         # series_t.append(t.id)
-        citation_sum = format_text(t.text, "citation")
+        citation_sum = format_text(t.text, 'citation')
         while(hasattr(t, 'next')):
             t = t.next
-            citation_sum = citation_sum + format_text(t.text, "citation")
+            citation_sum = citation_sum + format_text(t.text, 'citation')
     
 
     content = '<div className="appendix_container">' + appendix_sum + "</div>" + text_sum + citation_sum
