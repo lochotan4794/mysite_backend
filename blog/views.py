@@ -4,11 +4,11 @@ from time import time
 from django.http import JsonResponse
 # Create your views here.
 from rest_framework.generics import ListCreateAPIView
-from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, HTMLSerializer, ImageSerializer
+from blog.serializers import AppendixSerializer, CitationSerializer, Post1Serializer, PostSerializer, TextSerializer, CommentSerializer, StyleSerializer, TagSerializer, HTMLSerializer, ImageSerializer, UpdateSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
-from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag, Image, HTML
+from .models import Post, Relationship, Style, Text, Appendix, Citation, Comment, Tag, Image, HTML, Update
 # from .forms import ImageForm
 import distance
 from django.contrib.auth.models import User
@@ -736,7 +736,26 @@ def post_edit(request, slug):
                 'tags': TagSerializer(tags, many=True).data}
 
         return JsonResponse(data)
+
+@ csrf_exempt
+def updates(request):
+    updates = Update.objects.all().reverse()
+    serializer_post = UpdateSerializer(updates, many=True)
+    return  JsonResponse(serializer_post.data, safe=False)
     
+
+@ csrf_exempt
+def update_add(request):
+    try: 
+        day = request.POST['day']
+        content = request.POST['content']
+        heading = request.POST['heading']
+        updates = Update.create(day, heading, content)
+        updates.save()
+        serializer_post = UpdateSerializer(updates, many=False)
+    except Update.DoesNotExist:
+        return HttpResponse(status=404)
+    return  JsonResponse(serializer_post.data, safe=False)
 
 @ csrf_exempt
 def post_detail(request, slug):

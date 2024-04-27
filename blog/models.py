@@ -156,6 +156,27 @@ class HTML(models.Model):
 
     def __str__(self):
         return self.content
+    
+    
+class Update(models.Model):
+
+    heading = models.TextField(blank=True)
+    day = models.CharField(max_length=100, blank=True)
+    content = models.CharField(max_length=1000, unique=False, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+    @classmethod
+    def create(cls, day, heading, content):
+        update = cls(day=day, heading=heading, content=content)
+        # do something with the book
+        return update
+
+    class Meta:
+        ordering = ['created']
+
+    def __str__(self):
+        return self.content
 
 class Text(models.Model):
     post = models.ForeignKey(
