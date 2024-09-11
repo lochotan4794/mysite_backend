@@ -19,6 +19,20 @@ from django.template.defaultfilters import slugify
 from django.db.models import CharField
 # from django.db.models.functions import Search
 import numpy as np
+from django.db import connection
+from collections import namedtuple
+import json
+
+
+def namedtuplefetchall(cursor):
+    """
+    Return all rows from a cursor as a namedtuple.
+    Assume the column names are unique.
+    """
+    desc = cursor.description
+    nt_result = namedtuple("Result", [col[0] for col in desc])
+    return [nt_result(*row) for row in cursor.fetchall()]
+
 # CharField.register_lookup(Search)
 
 
@@ -175,6 +189,47 @@ def post_list(request):
         serializer_tag = TagSerializer(tags, many=True)
         response = {"tags": serializer_tag.data, "post": serializer_post.data}
         return JsonResponse(response)
+
+
+@ csrf_exempt
+def post_list_for_page(request):
+    if request.method == 'POST':
+        print(request.POST)
+        currentPage =  int(request.POST['currentPage'][0])
+        numberPerPage = int(request.POST['numberPerPage'][0])
+        
+        cursor = connection.cursor()
+        # try:
+        cursor.execute(r"SELECT  p.id, p.title, p.abstract, p.slug, p.ava, p.ver, p.created_on, t.title FROM blog_post p, blog_relationship r, blog_tag t "\
+                       r"WHERE p.id = r.post_id AND t.id=r.tag_id ORDER BY p.created_on DESC ")
+        
+        data = cursor.fetchall()
+        result = {}
+        for item in data:
+            key = item[0]
+            value = item[7]
+            if key in result:
+                result[key].append(value)
+            else:
+                result[key] = [value]            
+              #  json.append([item[0], item[1], item[2]])
+        jjson = {}
+        for item in data:
+            key = item[0]
+            if key in jjson:
+                next
+            else:
+                jjson[key] = {'post_id': item[0], 'post_title': item[1], 'post_abstract': item[2], 'slug': item[3], 'ava': item[4], 'ver': str(item[5]), 'created_on': item[6], 'tags': result[key]}  
+        ret =  []
+        vs = list(jjson.values())
+        count = len(vs)
+        numberPerPage = 10
+        for idx in range((currentPage - 1)*numberPerPage, currentPage * numberPerPage):
+            if idx < count:
+                ret.append(vs[idx])
+
+        return JsonResponse({"data": vs, "count": count}, safe=False)
+
 
 @ csrf_exempt
 def post_all(request):
@@ -497,7 +552,7 @@ def admin_side(request):
         post = Post.objects.get(slug=slug)
     except Post.DoesNotExist:
         post = Post.create(title="Dummy", slug=slug, thumnail=None, abstract="Dummy", updated_on=datetime.datetime.now(
-        ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0, static=0, currVer=1.0)
+        ), created_on=datetime.datetime.now(), status=0, total_visited=0, eng_ver=None, lang=0, static=0, ver=1.0)
 
     post.title = request.POST['title']
     post.slug = slug
@@ -524,8 +579,8 @@ def admin_side(request):
             post.video = request.POST['video']
         if 'topic' in request.POST:
             post.topic = request.POST['topic']
-        if 'currVer' in request.POST:
-            post.currVer = float(request.POST['currVer'])
+        if 'ver' in request.POST:
+            post.ver = float(request.POST['ver'])
 
         tags = json.loads(tag_data)
         for t in tags["data"]:
@@ -554,7 +609,6 @@ def admin_side(request):
             except Post.DoesNotExist:
                 eng_ver = None
             post.eng_ver = eng_ver
-        print(post.currVer)
         post.save()
         jsondata = {"slug": slug}
         return JsonResponse(jsondata)

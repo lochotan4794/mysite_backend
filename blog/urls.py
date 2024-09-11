@@ -25,6 +25,7 @@ urlpatterns = [
     # path('search/<key:key>/', view=views.search_default, name='keyword_list'),
     path('get/slug/all/', view=views.get_all_slugs, name='slug_list'),
     path('list/all/', view=views.post_list, name='list_post'),
+    path('list/current/', view=views.post_list_for_page, name='list_post_current'),
     path('post/all/', view=views.post_all, name='list_post'),
     path('list/relevent/', view=views.post_list_relevent, name='list_relevent'),
     path('list/recent/', view=views.post_list_recent, name='list_recent'),
