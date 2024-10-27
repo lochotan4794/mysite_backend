@@ -130,7 +130,6 @@ class Index(models.Model):
     style_id = models.IntegerField(choices=TEXT_FUNCTIONAL)
 
 
-
 class Image(models.Model):
     image = models.ImageField(upload_to='images', blank=True)
 

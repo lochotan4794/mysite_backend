@@ -205,6 +205,7 @@ def post_list_for_page(request):
         
         data = cursor.fetchall()
         result = {}
+        print(data)
         for item in data:
             key = item[0]
             value = item[7]
@@ -917,7 +918,9 @@ def post_detail(request, slug):
         serializer_appendist = AppendixSerializer(a, many=True)
         serializer_text = TextSerializer(t, many=True)
         serializer_citation = CitationSerializer(c, many=True)
-        print(TagSerializer(tags, many=True).data)
+        
+        # print(TagSerializer(tags, many=True).data)
+        
         data = {'post': serializer_post.data, 'appendix': serializer_appendist.data,
                 'text': serializer_text.data, 'citation': serializer_citation.data,
                 'styles': StyleSerializer(styles, many=True).data,
@@ -1154,7 +1157,7 @@ def get_html(request):
 
 def format_text(text, style):
     if style == 'paragraph':
-        return '<p className="post-body-text" >' + text.content + '</p>'
+        return '<p className="post-body-text" >' + text.content.replace('\minus', " - ") + '</p>'
     if style == 'code':
         return '<pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
     if style == 'image':
