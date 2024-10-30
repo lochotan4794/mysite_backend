@@ -53,13 +53,18 @@ class SignUp(CreateView):
 @csrf_exempt
 def load_profile(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        user = User.objects.get(username=username)
+        email = request.POST['email']
+        user = User.objects.get(username=email)
         if user is not None:
             data = UserSerializer(user).data
             return JsonResponse(data, safe=False)
         else:
-            return HttpResponse(status=500)
+            # return HttpResponse(status=500)
+            user = User.objects.create_user(username=request.POST['username'],
+                                 email=request.POST['email'])
+            user.save()
+            data = UserSerializer(user).data
+            return JsonResponse(data, safe=False)
 
 # class AddUser(CreateView):
 #     form_class = AddUserMultiForm
