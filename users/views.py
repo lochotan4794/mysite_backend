@@ -55,7 +55,7 @@ def load_profile(request):
     if request.method == 'POST':
         email = request.POST['email']
         try:
-            user = User.objects.get(username=email)
+            user = User.objects.get(email=email)
             data = UserSerializer(user).data
             return JsonResponse(data, safe=False)
         except User.DoesNotExist:
