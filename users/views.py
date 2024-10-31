@@ -54,11 +54,11 @@ class SignUp(CreateView):
 def load_profile(request):
     if request.method == 'POST':
         email = request.POST['email']
-        user = User.objects.get(username=email)
-        if user is not None:
+        try:
+            user = User.objects.get(username=email)
             data = UserSerializer(user).data
             return JsonResponse(data, safe=False)
-        else:
+        except User.DoesNotExist:
             # return HttpResponse(status=500)
             user = User.objects.create_user(username=request.POST['username'],
                                  email=request.POST['email'])
