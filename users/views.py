@@ -62,6 +62,11 @@ def load_profile(request):
             # return HttpResponse(status=500)
             user = User.objects.create_user(username=request.POST['username'],
                                  email=request.POST['email'])
+            user.first_name = request.POST['username']
+            user.last_name = request.POST['username']
+            user.set_password('password')
+            user.is_active = True
+            user.is_staff = False
             user.save()
             data = UserSerializer(user).data
             return JsonResponse(data, safe=False)
