@@ -546,6 +546,7 @@ def admin_saveModel(request):
 @ csrf_exempt
 def admin_side(request):
     slug = request.POST['slug']
+    print(slug)
     if slug == "Dummy":
         slug = slugify(request.POST['title']).lower()
 
@@ -580,8 +581,12 @@ def admin_side(request):
             post.video = request.POST['video']
         if 'topic' in request.POST:
             post.topic = request.POST['topic']
-        if 'ver' in request.POST:
-            post.ver = float(request.POST['ver'])
+        if 'ver' in request.POST :
+            # print(request.POST['ver'])
+            try:
+                post.ver = float(request.POST['ver'])
+            except:
+                post.ver = 1.0
 
         tags = json.loads(tag_data)
         for t in tags["data"]:
@@ -819,6 +824,7 @@ def post_detail(request, slug):
     """
     # Get Dummy object
     print(slug)
+    print("slug")
     if slug == "Dummy":
         try:
             dummy = Post.objects.get(title="Dummy")
@@ -831,7 +837,7 @@ def post_detail(request, slug):
                 'text': [], 'citation': [],
                 'styles': []}
         return JsonResponse(data)
-
+     
     post = get_object_or_404(Post, slug=slug)
 
     if post.static == 2:
@@ -1314,7 +1320,7 @@ def to_html(request):
         html.content = content
         html.save()
     except HTML.DoesNotExist:
-        html = HTML.create(slug=slug, abstract=slug, content=content)
+        html = HTML.create(slug=slug, abstract=request.POST['slug'], content=content)
         html.save()
     serializer_app = HTMLSerializer(html, many=False)
     return JsonResponse(serializer_app.data)

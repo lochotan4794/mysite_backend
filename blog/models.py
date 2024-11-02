@@ -142,7 +142,7 @@ class Image(models.Model):
 class HTML(models.Model):
 
     content = models.TextField(blank=True)
-    slug = models.CharField(max_length=100, blank=True)
+    slug = models.CharField(max_length=255, blank=True)
     abstract = models.CharField(max_length=1000, unique=True, blank=True)
 
     @classmethod
