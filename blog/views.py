@@ -1268,7 +1268,8 @@ def to_html(request):
         print(r.tag)
 
     try:
-        text = Text.objects.filter(post=post).filter(previous__isnull=True)
+        text = Text.objects.filter(post=post).filter(previous__isnull=True).first()
+        print(text)
         appendist = Appendix.objects.filter(
             post=post).filter(previous__isnull=True)
         citation = Citation.objects.filter(
@@ -1283,11 +1284,10 @@ def to_html(request):
     appendix_sum = ''
     citation_sum = '<h3>References</h3>'
 
-
-    for t in text:
+    for t in [text]:
         # series_t = list()
         # series_t.append(t.id)
-        text_sum = format_text(t, map_text_func(t.role));
+        text_sum = format_text(t, map_text_func(t.role))
         while(hasattr(t, 'next')):
             t = t.next
             text_sum = text_sum + format_text(t, map_text_func(t.role))
