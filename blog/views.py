@@ -1161,6 +1161,16 @@ def get_html(request):
     serializer_app = HTMLSerializer(html, many=False)
     return JsonResponse(serializer_app.data)
 
+def format_appendix(text, indentLevel):
+    if indentLevel == 0:
+        return '<li className="appendix_h2" ><a>' + text + '</a></li>'
+    if indentLevel == 1:
+        return '<li className="appendix_h3" ><a>' + text + '</a></li>'
+    if indentLevel == 2:
+        return '<li className="appendix_h4" ><a>' + text + '</a></li>'
+    if indentLevel == 3:
+        return '<li className="appendix_h5" ><a>' + text + '</a></li>'
+        
 def format_text(text, style):
     if style == 'paragraph':
         return '<p className="post-body-text" >' + text.content.replace('\minus', " - ") + '</p>'
@@ -1181,7 +1191,15 @@ def format_text(text, style):
     if style == 'citation':
         return '<li className="citation">' + text + '</li>'
     if style == 'appendix':
-        return '<li className="appendix" ><a>' + text + '</a></li>'
+        if text.indentLevel == 0:
+            return '<li className="appendix_h2" ><a>' + text.text + '</a></li>'
+        if text.indentLevel == 1:
+            return '<li className="appendix_h3" ><a>' + text.text + '</a></li>'
+        if text.indentLevel == 2:
+            return '<li className="appendix_h4" ><a>' + text.text + '</a></li>'
+        if text.indentLevel == 3:
+            return '<li className="appendix_h5" ><a>' + text.text + '</a></li>'
+        
     return str(text)
     
 TEXT_FUNCTIONAL = (
@@ -1299,10 +1317,10 @@ def to_html(request):
     for t in appendist:
         # series_t = list()
         # series_t.append(t.id)
-        appendix_sum = format_text(t.text, 'appendix')
+        appendix_sum = format_appendix(t.text, t.indentLevel)
         while(hasattr(t, 'next')):
             t = t.next
-            appendix_sum = appendix_sum + format_text(t.text, 'appendix')
+            appendix_sum = appendix_sum + format_appendix(t.text, t.indentLevel)
 
     for t in citation:
         # series_t = list()
