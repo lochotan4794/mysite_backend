@@ -102,6 +102,8 @@ class Post(models.Model):
     static = models.IntegerField(default=0)
     currVer = models.FloatField(default=1.0, blank=True)
     ver = models.FloatField(default=1.0, blank=True)
+    authors = ArrayField(models.CharField(
+        max_length=100), blank=True, unique=False, default=list)
 
     class Meta:
         ordering = ['-created_on']
