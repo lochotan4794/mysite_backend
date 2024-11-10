@@ -82,12 +82,13 @@ class PostSerializer(serializers.ModelSerializer):
     previous_post = RelatedPostSerializer()
     next_post = RelatedPostSerializer()
     created_on = serializers.DateTimeField(format="%Y/%m/%d")
-    # features = StringArrayField()
+    authors = serializers.ListField(child=serializers.CharField())
+    # authors = StringArrayField()
 
     class Meta: 
         model = Post
         fields = ('title', 'slug', 'updated_on', 'created_on',
-                  'status', 'thumnail', 'abstract', 'total_visited', 'eng_ver', 'lang', 'relationship', 'video', 'pdf', 'previous_post', 'next_post', 'topic', 'ava', 'modelLink', 'features', 'static', 'currVer')
+                  'status', 'thumnail', 'abstract', 'total_visited', 'eng_ver', 'lang', 'relationship', 'video', 'pdf', 'previous_post', 'next_post', 'topic', 'ava', 'modelLink', 'features', 'static', 'currVer', 'authors')
 
         # def get_related_field(self, model_field):
         #     return PostSerializer()
@@ -105,12 +106,13 @@ class Post1Serializer(serializers.ModelSerializer):
     previous_post = RelatedPostSerializer()
     next_post = RelatedPostSerializer()
     created_on = serializers.DateTimeField(format="%Y/%m/%d")
+    authors = serializers.ListField(child=serializers.CharField())
 
 
     class Meta:
         model = Post
         fields = ('id', 'title', 'slug', 'updated_on', 'created_on',
-                  'status', 'thumnail', 'abstract', 'total_visited', 'eng_ver', 'lang', 'relationship', 'video', 'pdf', 'previous_post', 'next_post', 'topic', 'ava', 'static', 'currVer')
+                  'status', 'thumnail', 'abstract', 'total_visited', 'eng_ver', 'lang', 'relationship', 'video', 'pdf', 'previous_post', 'next_post', 'topic', 'ava', 'static', 'currVer', 'authors')
 
         # def get_related_field(self, model_field):
         #     return PostSerializer()

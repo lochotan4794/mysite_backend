@@ -200,7 +200,7 @@ def post_list_for_page(request):
         
         cursor = connection.cursor()
         # try:
-        cursor.execute(r"SELECT  p.id, p.title, p.abstract, p.slug, p.ava, p.ver, p.created_on, t.title FROM blog_post p, blog_relationship r, blog_tag t "\
+        cursor.execute(r"SELECT  p.id, p.title, p.abstract, p.slug, p.ava, p.ver, p.created_on, p.authors, t.title FROM blog_post p, blog_relationship r, blog_tag t "\
                        r"WHERE p.id = r.post_id AND t.id=r.tag_id ORDER BY p.created_on DESC ")
         
         data = cursor.fetchall()
@@ -208,7 +208,7 @@ def post_list_for_page(request):
         print(data)
         for item in data:
             key = item[0]
-            value = item[7]
+            value = item[8]
             if key in result:
                 result[key].append(value)
             else:
@@ -220,7 +220,7 @@ def post_list_for_page(request):
             if key in jjson:
                 next
             else:
-                jjson[key] = {'post_id': item[0], 'post_title': item[1], 'post_abstract': item[2], 'slug': item[3], 'ava': item[4], 'ver': str(item[5]), 'created_on': item[6], 'tags': result[key]}  
+                jjson[key] = {'post_id': item[0], 'post_title': item[1], 'post_abstract': item[2], 'slug': item[3], 'ava': item[4], 'ver': str(item[5]), 'created_on': item[6], 'authors': item[7], 'tags': result[key], }  
         ret =  []
         vs = list(jjson.values())
         count = len(vs)
