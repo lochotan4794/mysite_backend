@@ -1175,7 +1175,7 @@ def format_text(text, style):
     if style == 'paragraph':
         return '<p className="post-body-text" >' + text.content.replace('\minus', " - ") + '</p>'
     if style == 'ol':
-        return '<ol className="item-list" >' + text.content + '</ol>'
+        return '<li className="item-list" >' + text.content + '</li>'
     if style == 'code':
         return '<pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
     if style == 'image':
