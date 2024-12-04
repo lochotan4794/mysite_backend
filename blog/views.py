@@ -1177,7 +1177,7 @@ def format_text(text, style):
     if style == 'ol':
         return '<li className="item-list" >' + text.content + '</li>'
     if style == 'code':
-        return '<button class="copy-button" id = '+ text.id +'>Click to copy</button><pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
+        return '<button class="copy-button" id = copy_button_'+ str(text.id) +'>Click to copy</button><pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
     if style == 'image':
         return '<figure className="figure_in_post"><img loading="lazy" className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
     if style == 'head1':
