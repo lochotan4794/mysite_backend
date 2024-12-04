@@ -1171,13 +1171,13 @@ def format_appendix(text, indentLevel):
     if indentLevel == 3:
         return '<li className="appendix_h5" ><a>' + text + '</a></li>'
         
-def format_text(text, style):
+def format_text(text, style, id=0):
     if style == 'paragraph':
         return '<p className="post-body-text" >' + text.content.replace('\minus', " - ") + '</p>'
     if style == 'ol':
         return '<li className="item-list" >' + text.content + '</li>'
     if style == 'code':
-        return '<button class="copy-button" id = copy_button_'+ str(text.id) +'>Click to copy</button><pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
+        return '<button class="copy-button" id = copy_button_'+ str(id) +'>Click to copy</button><pre className="pre_in_post"><code className="language-python">' + text.content + '</code></pre>'
     if style == 'image':
         return '<figure className="figure_in_post"><img loading="lazy" className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
     if style == 'head1':
@@ -1305,14 +1305,25 @@ def to_html(request):
     text_sum = ''
     appendix_sum = ''
     citation_sum = '<h3>References</h3>'
+    
+    code_id = 0
 
     for t in [text]:
         # series_t = list()
         # series_t.append(t.id)
-        text_sum = format_text(t, map_text_func(t.role))
+        if t.role == 10:
+            text_sum = format_text(t, map_text_func(t.role), code_id)
+            code_id = code_id + 1
+        else:
+            text_sum = format_text(t, map_text_func(t.role))
         while(hasattr(t, 'next')):
             t = t.next
-            text_sum = text_sum + format_text(t, map_text_func(t.role))
+            # text_sum = text_sum + format_text(t, map_text_func(t.role))
+            if t.role == 10:
+                text_sum = format_text(t, map_text_func(t.role), code_id)
+                code_id = code_id + 1
+            else:
+                text_sum = format_text(t, map_text_func(t.role))
 
     Rs = []
     for r in relationship:
