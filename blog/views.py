@@ -1320,10 +1320,10 @@ def to_html(request):
             t = t.next
             # text_sum = text_sum + format_text(t, map_text_func(t.role))
             if t.role == 10:
-                text_sum = format_text(t, map_text_func(t.role), code_id)
+                text_sum = text_sum + format_text(t, map_text_func(t.role), code_id)
                 code_id = code_id + 1
             else:
-                text_sum = format_text(t, map_text_func(t.role))
+                text_sum = text_sum + format_text(t, map_text_func(t.role))
 
     Rs = []
     for r in relationship:
