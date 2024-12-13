@@ -1174,6 +1174,8 @@ def format_appendix(text, indentLevel):
 def format_text(text, style, id=0):
     if style == 'paragraph':
         return '<p className="post-body-text" >' + text.content.replace('\minus', " - ") + '</p>'
+    if style == 'math':
+        return '<p className="post-body-text math" >' + text.content.replace('\minus', " - ") + '</p>'
     if style == 'ol':
         return '<li className="item-list" >' + text.content + '</li>'
     if style == 'code':
@@ -1181,13 +1183,13 @@ def format_text(text, style, id=0):
     if style == 'image':
         return '<figure className="figure_in_post"><img loading="lazy" className="img_in_post" src="' + text.image.url + '"></img><figcaption className="caption_img_in_post">' + text.content + '</figcaption></figure>'
     if style == 'head1':
-        return '<p className="h2_text">' + text.content + '</p>'
+        return '<p className="h1_text">' + text.content + '</p>'
     if style == 'head2':
         return '<p className="h2_text">' + text.content + '</p>'
     if style == 'head3':
         return '<p className="h3_text">' + text.content + '</p>'
     if style == "head4":
-        return '<p className="h3_text">' + text.content + '</p>'
+        return '<p className="h4_text">' + text.content + '</p>'
     if style == 'html':
         return text.content
     if style == 'citation':
@@ -1248,6 +1250,8 @@ def map_text_func(text_func):
         return 'html'
     if text_func == 11:
         return 'ol'
+    if text_func == 15:
+        return 'math'
     return 'paragraph'
     
 @ csrf_exempt
