@@ -1094,6 +1094,7 @@ def update_comment(request, slug):
     if request.method == 'GET':
         commentSerializer = CommentSerializer(comment, many=True)
         return JsonResponse(commentSerializer.data, safe=False)
+    
 # class BlogDetail(DetailView):
 #     template_name= 'detail.html'
 #     model= Blog
