@@ -17,6 +17,12 @@ import argparse
 import json
 import requests
 import google.auth.transport.requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv('../var.env')
+
+# print(os.getenv('PROJECT'))
 
 from google.oauth2 import service_account
 
@@ -200,7 +206,8 @@ def load_profile(request):
 
 
 def send_message(registration_ids , message_title , message_body, message_subtitle):
-    cloud_messaging_api_key = settings.CLOUD_MESSAGING_API_KEY
+    # cloud_messaging_api_key = settings.CLOUD_MESSAGING_API_KEY
+    cloud_messaging_api_key = os.getenv('CLOUD_MESSAGING_API_KEY')
     url = "https://fcm.googleapis.com/fcm/send"
 
     headers = {
@@ -227,7 +234,8 @@ def send_message(registration_ids , message_title , message_body, message_subtit
 
 def index(request):
     # key pair under web configuration
-    vapid_key = settings.PUBLIC_VAPID_KEY
+    # vapid_key = settings.PUBLIC_VAPID_KEY
+    vapid_key = os.getenv('PUBLIC_VAPID_KEY')
     context = {}
     context['vapid_key'] = vapid_key
     return render(request , 'index.html', context)
