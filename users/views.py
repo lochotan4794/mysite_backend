@@ -10,7 +10,122 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User, auth
 from django.http import HttpResponse, JsonResponse
 from .serializers import UserProfileSerializer, UserSerializer
+from django.conf import settings
+import requests
+import json
+import argparse
+import json
+import requests
+import google.auth.transport.requests
 
+from google.oauth2 import service_account
+
+# https://github.com/firebase/quickstart-python/blob/2c68e7c5020f4dbb072cca4da03dba389fbbe4ec/messaging/messaging.py#L26-L35
+PROJECT_ID = 't-test-700f2'
+BASE_URL = 'https://fcm.googleapis.com'
+FCM_ENDPOINT = 'v1/projects/' + PROJECT_ID + '/messages:send'
+FCM_URL = BASE_URL + '/' + FCM_ENDPOINT
+SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
+
+
+def _build_common_message():
+  """Construct common notifiation message.
+
+  Construct a JSON object that will be used to define the
+  common parts of a notification message that will be sent
+  to any app instance subscribed to the news topic.
+  """
+  return {
+    'message': {
+      'topic': 'news',
+      'notification': {
+        'title': 'FCM Notification',
+        'body': 'Notification from FCM'
+      }
+    }
+  }
+  
+def _build_specific_device_message():
+  """Construct common notifiation message.
+
+  Construct a JSON object that will be used to define the
+  common parts of a notification message that will be sent
+  to any app instance subscribed to the news topic.
+  """
+  return {
+   "message":{
+      "token":"dwgcg_QeXUTCqdiCaWw_9I:APA91bHdf-JT_r9JaCmulnL9NRguhasra-rerrAlpyPK8wAz8Le0VSXRg4aUQRub_dAspOkCHEB1ToKsPRgWzLeC_MdTZztyahEuhUvYQWVAz3LsIxcxGU4",
+      "notification":{
+        "body":"This is an FCM notification message!",
+        "title":"FCM Message"
+      }
+   }
+}
+
+def _build_override_message():
+  """Construct common notification message with overrides.
+
+  Constructs a JSON object that will be used to customize
+  the messages that are sent to iOS and Android devices.
+  """
+  fcm_message = _build_common_message()
+
+  apns_override = {
+    'payload': {
+      'aps': {
+        'badge': 1
+      }
+    },
+    'headers': {
+      'apns-priority': '10'
+    }
+  }
+
+  android_override = {
+    'notification': {
+      'click_action': 'android.intent.action.MAIN'
+    }
+  }
+
+  fcm_message['message']['android'] = android_override
+  fcm_message['message']['apns'] = apns_override
+
+  return fcm_message
+# [START retrieve_access_token]
+def _get_access_token():
+  """Retrieve a valid access token that can be used to authorize requests.
+
+  :return: Access token.
+  """
+  credentials = service_account.Credentials.from_service_account_file(
+    't-test-700f2-firebase-adminsdk-fbsvc-72cb33983a.json', scopes=SCOPES)
+  request = google.auth.transport.requests.Request()
+  credentials.refresh(request)
+  return credentials.token
+# [END retrieve_access_token]
+
+def _send_fcm_message(fcm_message):
+  """Send HTTP request to FCM with given message.
+
+  Args:
+    fcm_message: JSON object that will make up the body of the request.
+  """
+  # [START use_access_token]
+  headers = {
+    'Authorization': 'Bearer ' + _get_access_token(),
+    'Content-Type': 'application/json; UTF-8',
+  }
+  # [END use_access_token]
+  resp = requests.post(FCM_URL, data=json.dumps(fcm_message), headers=headers)
+
+  if resp.status_code == 200:
+    print('Message sent to Firebase for delivery, response:')
+    print(resp.text)
+  else:
+    print('Unable to send message to Firebase')
+    print(resp.text)
+    
+    
 # Create your views here.
 @csrf_exempt
 def edit_profile(request):
@@ -82,3 +197,91 @@ def load_profile(request):
 #         profile.user_name = User.objects.get(username=user.username)
 #         profile.save()
 #         return redirect(self.success_url)
+
+
+def send_message(registration_ids , message_title , message_body, message_subtitle):
+    cloud_messaging_api_key = settings.CLOUD_MESSAGING_API_KEY
+    url = "https://fcm.googleapis.com/fcm/send"
+
+    headers = {
+    "Content-Type":"application/json",
+    "Authorization": 'key=' + cloud_messaging_api_key
+    }
+
+    payload = {
+        "registration_ids" :registration_ids,
+        "priority" : "high",
+        "notification" : {
+            "body" : message_body,
+            "title" : message_title,
+            "subtitle": message_subtitle
+            # "image" : image_link,
+            # "icon": icon_link,
+        }
+    }
+
+    result = requests.post(url,  data=json.dumps(payload), headers=headers )
+    print(result)
+    # print(result.json())
+
+
+def index(request):
+    # key pair under web configuration
+    vapid_key = settings.PUBLIC_VAPID_KEY
+    context = {}
+    context['vapid_key'] = vapid_key
+    return render(request , 'index.html', context)
+
+def send_notification(request, fcm_notification_device_key):
+    device_registration  = [
+        fcm_notification_device_key
+    ]
+    # send_message(device_registration , 'This is the Message Title' , 'This is the Message Body', 'This is the Message Subtitle')
+    common_message = _build_specific_device_message()
+    _send_fcm_message(common_message)
+    return HttpResponse("Sent ")
+
+
+@csrf_exempt
+def send_notification_to_device(request):
+    if request.method == 'POST':
+      token = request.POST['token']
+      message  =  {
+          "message":{
+              "token": token,
+              "notification":{
+                "body":"This is an FCM notification message!",
+                "title":"FCM Message"
+              }
+          }
+        }
+      _send_fcm_message(message)
+    return HttpResponse("Sent ") 
+        
+        
+        
+def showFirebaseJS(request):
+    data='importScripts("https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js");' \
+         'importScripts("https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js"); ' \
+         'var firebaseConfig = {' \
+         '        apiKey: "AIzaSyCiAdGczVjOPZdfFuFTHlt8wpjYTVQcUqQ",' \
+         '        authDomain: "t-test-700f2.firebaseapp.com",' \
+         '        projectId: "t-test-700f2",' \
+         '        storageBucket: " t-test-700f2.firebasestorage.app",' \
+         '        messagingSenderId: "327626225298",' \
+         '        appId: "1:327626225298:web:7682abe65275b298aa184b",' \
+         '        measurementId: "G-EF7KXQC5MR"' \
+         ' };' \
+         'firebase.initializeApp(firebaseConfig);' \
+         'const messaging=firebase.messaging();' \
+         'messaging.setBackgroundMessageHandler(function (payload) {' \
+         '    console.log(payload);' \
+         '    const notification=JSON.parse(payload);' \
+         '    const notificationOption={' \
+         '        body:notification.body,' \
+         '        icon:notification.icon' \
+         '    };' \
+         '    return self.registration.showNotification(payload.notification.title,notificationOption);' \
+         '});'
+
+    return HttpResponse(data,content_type="text/javascript")

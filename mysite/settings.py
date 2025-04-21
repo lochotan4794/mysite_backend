@@ -29,6 +29,9 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
+PUBLIC_VAPID_KEY = "BDgP3G6wV_pjGBhdqcTWHgVcQU7d3K12rglffIF03dLvqRtA9OOvm3WSUzmrpTdpbqWT5693_cKfk_XDby1IrE4"
+CLOUD_MESSAGING_API_KEY = "AIzaSyCiAdGczVjOPZdfFuFTHlt8wpjYTVQcUqQ"
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-f$tx09suq-(baomq^l%-u6^zmtw&#ts-983dg(tu-vs_-!piuy'
 
