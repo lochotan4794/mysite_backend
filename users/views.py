@@ -17,10 +17,10 @@ import argparse
 import requests
 import google.auth.transport.requests
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from twilio.rest import Client
 
-load_dotenv('../var.env')
+load_dotenv(find_dotenv())
 
 # print(os.getenv('PROJECT'))
 
@@ -197,7 +197,7 @@ def start(request):
             .verifications \
             .create(to=full_phone, channel='sms')
         response_data = {}
-        response_data['result'] = 'OK'
+        response_data['result'] = r.status
         response_data['message'] = 'Valid token'
         return JsonResponse(response_data)
     except Exception as e:
