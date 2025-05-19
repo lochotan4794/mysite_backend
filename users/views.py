@@ -14,11 +14,11 @@ from django.conf import settings
 import requests
 import json
 import argparse
-import json
 import requests
 import google.auth.transport.requests
 import os
 from dotenv import load_dotenv
+from twilio.rest import Client
 
 load_dotenv('../var.env')
 
@@ -32,6 +32,14 @@ BASE_URL = 'https://fcm.googleapis.com'
 FCM_ENDPOINT = 'v1/projects/' + PROJECT_ID + '/messages:send'
 FCM_URL = BASE_URL + '/' + FCM_ENDPOINT
 SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
+
+
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+VERIFY_SERVICE_SID = os.getenv('VERIFY_SERVICE_SID')
+
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
 
 
 def _build_common_message():
@@ -169,7 +177,72 @@ class SignUp(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
+    
+#https://github.com/robinske/verify-server/blob/master/app.py
 
+@csrf_exempt
+def start(request):
+  if request.method == 'POST':
+    TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+    VERIFY_SERVICE_SID = os.getenv('VERIFY_SERVICE_SID')
+
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    country_code = request.POST['country_code']
+    phone_number = request.POST['phone_number']
+    full_phone = "+{}{}".format(country_code, phone_number)
+    try:
+        r = client.verify \
+            .services(VERIFY_SERVICE_SID) \
+            .verifications \
+            .create(to=full_phone, channel='sms')
+        response_data = {}
+        response_data['result'] = 'OK'
+        response_data['message'] = 'Valid token'
+        return JsonResponse(response_data)
+    except Exception as e:
+        response_data = {}
+        response_data['result'] = 'NOT OK'
+        response_data['message'] = 'Error checking'
+        return JsonResponse(response_data) 
+           
+@csrf_exempt
+def check(request):
+    if request.method == 'POST':
+      country_code = request.POST['country_code']
+      phone_number = request.POST['phone_number']
+      full_phone = "+{}{}".format(country_code, phone_number)
+      code = request.POST['verification_code']
+      
+      TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+      TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+      VERIFY_SERVICE_SID = os.getenv('VERIFY_SERVICE_SID')
+
+      client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+      SERVICE = VERIFY_SERVICE_SID
+
+      try:
+          r = client.verify \
+              .services(SERVICE) \
+              .verification_checks \
+              .create(to=full_phone, code=code)
+
+          if r.status == "approved":
+              response_data = {}
+              response_data['result'] = 'OK'
+              response_data['message'] = 'Valid token'
+              return JsonResponse(response_data)
+          else:
+              response_data = {}
+              response_data['result'] = 'NOT OK'
+              response_data['message'] = 'invalid token'
+              return JsonResponse(response_data)
+      except Exception as e:
+              response_data = {}
+              response_data['result'] = 'NOT OK'
+              response_data['message'] = 'Error checking'
+              return JsonResponse(response_data)
 
 @csrf_exempt
 def load_profile(request):
@@ -265,8 +338,6 @@ def send_notification_to_device(request):
         }
       _send_fcm_message(message)
     return HttpResponse("Sent ") 
-        
-        
         
 def showFirebaseJS(request):
     data='importScripts("https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js");' \
