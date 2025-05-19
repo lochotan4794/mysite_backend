@@ -183,9 +183,9 @@ class SignUp(CreateView):
 @csrf_exempt
 def start(request):
   if request.method == 'POST':
-    TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-    VERIFY_SERVICE_SID = os.getenv('VERIFY_SERVICE_SID')
+    TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+    TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+    VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
 
     client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
     country_code = request.POST['country_code']
@@ -214,9 +214,9 @@ def check(request):
       full_phone = "+{}{}".format(country_code, phone_number)
       code = request.POST['verification_code']
       
-      TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-      TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-      VERIFY_SERVICE_SID = os.getenv('VERIFY_SERVICE_SID')
+      TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+      TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+      VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
 
       client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
