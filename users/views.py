@@ -191,6 +191,8 @@ def start(request):
     country_code = request.POST['country_code']
     phone_number = request.POST['phone_number']
     full_phone = "+{}{}".format(country_code, phone_number)
+    
+    print(TWILIO_ACCOUNT_SID)
     try:
         r = client.verify \
             .services(VERIFY_SERVICE_SID) \
