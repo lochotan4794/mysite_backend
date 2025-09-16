@@ -209,6 +209,40 @@ def start(request):
         return JsonResponse(response_data) 
            
 @csrf_exempt
+def check_admin_code(request):
+    if request.method == 'POST':
+      admin_code = request.POST['admin_code']
+      # print(admin_code)
+      if int(admin_code) == 214537:
+        response_data = {}
+        response_data['result'] = 'OK'
+        # response_data['message'] = 'Valid token'
+        # print("OK")
+        return JsonResponse(response_data)
+      else:
+        # print("saiiiiii")
+        # print("NOT OK")
+        response_data = {}
+        response_data['result'] = 'NOT OK'
+        # response_data['message'] = 'invalid token'
+        return JsonResponse(response_data)
+      
+    if request.method == 'GET':
+      admin_code = request.GET['admin_code']
+      if admin_code == 214537:
+        response_data = {}
+        response_data['result'] = 'OK'
+        # response_data['message'] = 'Valid token'
+        print("OK")
+        return JsonResponse(response_data)
+      else:
+        print("NOT OK")
+        response_data = {}
+        response_data['result'] = 'NOT OK'
+        # response_data['message'] = 'invalid token'
+        return JsonResponse(response_data)
+      
+@csrf_exempt
 def check(request):
     if request.method == 'POST':
       country_code = request.POST['country_code']
