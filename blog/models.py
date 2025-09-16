@@ -194,6 +194,7 @@ class Text(models.Model):
     role = models.IntegerField(choices=TEXT_FUNCTIONAL, default=0)
     image = models.ImageField(upload_to='images', blank=True)
     cssId = models.CharField(max_length=100, blank=True)
+    csvTable = models.TextField(blank=True, null=True)
     # image_src = models.CharField(max_length=100, blank=True)
     # index = models.ForeignKey(
     #     Index,
@@ -204,9 +205,9 @@ class Text(models.Model):
     # date_created = models.DateTimeField(default=datetime.now(), blank=True)
 
     @classmethod
-    def create(cls, post, previous, content, link, role, image, cssId):
+    def create(cls, post, previous, content, link, role, image, cssId,csvTable):
         text = cls(post=post, previous=previous, content=content,
-                   link=link, role=role, image=image, cssId=cssId)
+                   link=link, role=role, image=image, cssId=cssId, csvTable=csvTable)
         # do something with the book
         return text
 

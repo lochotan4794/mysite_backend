@@ -19,10 +19,11 @@ from django.template.defaultfilters import slugify
 from django.db.models import CharField
 # from django.db.models.functions import Search
 import numpy as np
+import pandas
 from django.db import connection
 from collections import namedtuple
 import json
-
+# import pandas as pd
 
 def namedtuplefetchall(cursor):
     """
@@ -357,7 +358,14 @@ def admin_add(request):
             image = None
         cssId = request.POST['cssId']
         role = request.POST['role']
-        text = Text.create(post, previous, content, link, role, image, cssId)
+        if 'csv' in request.FILES:
+            csv = request.FILES['csv']
+            a = pandas.read_csv(csv)
+            csvTable = a.to_html(index=False)
+        else:
+            csv = None
+            csvTable = None
+        text = Text.create(post, previous, content, link, role, image, cssId,csvTable=csvTable)
         text.save()
         serializer_text = TextSerializer(text, many=False)
         return JsonResponse(serializer_text.data)
@@ -396,6 +404,15 @@ def admin_update(request):
         text.link = link
         text.image = image
         text.cssId = cssId
+        if 'csv' in request.FILES:
+            csv = request.FILES['csv']
+            a = pandas.read_csv(csv)
+            csvTable = a.to_html(index=False)
+        else:
+            csv = None
+            csvTable = None
+        print("csv table", csvTable)
+        text.csvTable = csvTable
         text.save()
     if (type == "citation"):
         text = request.POST['text']
@@ -1187,6 +1204,12 @@ def format_text(text, style, id=0):
         return '<p className="h1_text">' + text.content + '</p>'
     if style == 'head2':
         return '<p className="h2_text">' + text.content + '</p>'
+    if style == 'csv':
+        # a = pandas.read_csv( text.content ) 
+        # html_file = a.to_html()
+        # return html_file
+        # print(text.csvTable)
+        return text.csvTable
     if style == 'head3':
         return '<p className="h3_text">' + text.content + '</p>'
     if style == "head4":
@@ -1225,7 +1248,10 @@ TEXT_FUNCTIONAL = (
     (14, 'html_styled'),
     (15, 'math'),
     (16, 'table'),
-    (17, 'img_src'))
+    (17, 'img_src'),
+    (18, 'ver'),
+    (19, 'csv'),
+    )
     
 def map_text_func(text_func):
 
@@ -1253,6 +1279,8 @@ def map_text_func(text_func):
         return 'ol'
     if text_func == 15:
         return 'math'
+    if text_func == 19:
+        return 'csv'
     return 'paragraph'
     
 @ csrf_exempt
@@ -1310,9 +1338,7 @@ def to_html(request):
     text_sum = ''
     appendix_sum = ''
     citation_sum = '<h3>References</h3>'
-    
     code_id = 0
-
     for t in [text]:
         # series_t = list()
         # series_t.append(t.id)
@@ -1329,7 +1355,7 @@ def to_html(request):
                 code_id = code_id + 1
             else:
                 text_sum = text_sum + format_text(t, map_text_func(t.role))
-
+    print(text_sum)
     Rs = []
     for r in relationship:
         Rs.append(r.tag.title)

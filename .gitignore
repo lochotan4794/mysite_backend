@@ -8,7 +8,15 @@
 .venv/
 .env/*
 .env/
-Archive.zip
+*.zip
 debug.log
-t-test-700f2-firebase-adminsdk-fbsvc-72cb33983a.json
+*.json
 var.env
+*.pyc
+*.csv
+*.ipynb
+*/migrations/*
+*.htm
+settings.py
+./mysite/settings.py
+*/__pycache__/*

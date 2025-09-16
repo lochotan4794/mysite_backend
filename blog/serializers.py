@@ -27,7 +27,7 @@ class TextSerializer(serializers.ModelSerializer):
     class Meta:
         model = Text
         fields = ('link', 'content',
-                   'image', 'role', 'cssId', 'id')
+                   'image', 'role', 'cssId', 'id', 'csvTable')
 
 
 class AppendixSerializer(serializers.ModelSerializer):
