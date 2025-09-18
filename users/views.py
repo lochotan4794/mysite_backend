@@ -19,12 +19,25 @@ import google.auth.transport.requests
 import os
 from dotenv import load_dotenv, find_dotenv
 from twilio.rest import Client
-
+from fast_autocomplete import AutoComplete
+# from google.cloud import firestore
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 load_dotenv(find_dotenv())
 
 # print(os.getenv('PROJECT'))
+import pyrebase
 
 from google.oauth2 import service_account
+
+####### FIREBASE ###########
+
+cred = credentials.Certificate("t-test-700f2-firebase-adminsdk-fbsvc-72cb33983a.json")
+firebase_admin.initialize_app(cred)
+database = firestore.client()
+
+####### END OF FIREBASE #####
 
 # https://github.com/firebase/quickstart-python/blob/2c68e7c5020f4dbb072cca4da03dba389fbbe4ec/messaging/messaging.py#L26-L35
 PROJECT_ID = 't-test-700f2'
@@ -207,6 +220,28 @@ def start(request):
         response_data['result'] = 'NOT OK'
         response_data['message'] = 'Error checking'
         return JsonResponse(response_data) 
+    
+def my_stream_handler(data_chunk):
+        print(f"Received data: {data_chunk}")
+        return data_chunk
+@csrf_exempt
+def autocomplete(request):
+    keyword = request.POST['keyword']
+    # Use a service account.
+    #print(text)
+    tags = database.collection("tags").stream()
+    words = {}
+    for doc in tags:
+      words[doc.id] = {}
+    autocomplete = AutoComplete(words=words)
+    values = autocomplete.search(keyword, max_cost=3, size=3)
+    print(values)
+    values = ','.join(sorted(set(str(item) for sublist in values for item in sublist)))
+
+    response_data = json.dumps(values)
+    # response_data['result'] = 'NOT OK'
+    # response_data['message'] = 'Error checking'
+    return JsonResponse(response_data, safe=False) 
            
 @csrf_exempt
 def check_admin_code(request):
