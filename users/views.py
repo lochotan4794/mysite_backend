@@ -234,13 +234,7 @@ def autocomplete(request):
       words[doc.id] = {}
     autocomplete = AutoComplete(words=words)
     values = autocomplete.search(keyword, max_cost=3, size=3)
-    print(values)
-    values = ','.join(sorted(set(str(item) for sublist in values for item in sublist)))
-
-    response_data = json.dumps(values)
-    # response_data['result'] = 'NOT OK'
-    # response_data['message'] = 'Error checking'
-    return JsonResponse(response_data, safe=False) 
+    return JsonResponse(values, safe=False) 
            
 @csrf_exempt
 def check_admin_code(request):
