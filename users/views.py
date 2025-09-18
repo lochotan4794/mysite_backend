@@ -27,7 +27,6 @@ from firebase_admin import firestore
 load_dotenv(find_dotenv())
 
 # print(os.getenv('PROJECT'))
-import pyrebase
 
 from google.oauth2 import service_account
 
